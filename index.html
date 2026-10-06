@@ -1,3 +1,11 @@
+Uncaught SyntaxError: Invalid regular expression: /\\$+/g: Nothing to repeat
+```
+
+In JavaScript, `/\\$+/` treats `$` as an end-of-line anchor rather than a dollar sign, making `+` invalid and throwing a **SyntaxError**. Because a syntax error stops script parsing immediately, **the browser halted the entire script before registering the Send and Speak button click listeners**[cite: 14].
+
+Here is the clean, working **`index.html`** with that syntax error fixed:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,11 +13,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sagar'AI factory - AI Tools Foundry</title>
   
-  <!-- KaTeX for Notebook Textbook Mathematics -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     
@@ -23,7 +26,6 @@
       flex-direction: column;
     }
 
-    /* Video Background Container */
     .video-background {
       position: fixed;
       top: 0;
@@ -276,7 +278,7 @@
 </head>
 <body>
 
-  <!-- Fullscreen Animated Video Background (4s to 60s) -->
+  <!-- Background Video -->
   <div class="video-background">
     <iframe 
       id="bg-player"
@@ -317,82 +319,31 @@
 
   <footer>
     <div class="input-row">
-      <button class="btn-main" id="speak-btn" type="button">🎤 Speak</button>
+      <button class="btn-main" id="speak-btn" type="button" onclick="startVoiceInput()">🎤 Speak</button>
       <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." autocomplete="off">
-      <button class="btn-main" id="send-btn" type="button">Send ➔</button>
+      <button class="btn-main" id="send-btn" type="button" onclick="executeSend()">Send ➔</button>
     </div>
   </footer>
 
+  <!-- Safe KaTeX Library -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
+
   <script>
-    /* =========================================================
-       1. YOUTUBE BACKGROUND LOOP (4s -> 60s)
-       ========================================================= */
-    let player;
-    const START_TIME = 4;
-    const END_TIME = 60;
-
-    function onYouTubeIframeAPIReady() {
-      try {
-        player = new YT.Player('bg-player', {
-          events: {
-            onReady: (event) => {
-              event.target.mute();
-              event.target.seekTo(START_TIME, true);
-              event.target.playVideo();
-
-              setInterval(() => {
-                if (player && player.getCurrentTime) {
-                  const cur = player.getCurrentTime();
-                  if (cur >= END_TIME || cur < START_TIME) {
-                    player.seekTo(START_TIME, true);
-                    player.playVideo();
-                  }
-                }
-              }, 300);
-            },
-            onStateChange: (event) => {
-              if (event.data === YT.PlayerState.ENDED) {
-                player.seekTo(START_TIME, true);
-                player.playVideo();
-              }
-            }
-          }
-        });
-      } catch (e) {
-        console.warn("YouTube API init:", e);
-      }
-    }
-
-    window.addEventListener('click', () => {
-      if (player && player.playVideo) {
-        player.mute();
-        player.playVideo();
-      }
-    }, { once: true });
-
-    /* =========================================================
-       2. FAIL-SAFE EVENT BINDING & EXECUTION
-       ========================================================= */
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
 
     document.addEventListener("DOMContentLoaded", () => {
-      const inputField = document.getElementById("user-input");
-      const sendBtn = document.getElementById("send-btn");
-      const speakBtn = document.getElementById("speak-btn");
-
-      sendBtn.addEventListener("click", executeSend);
-      
-      inputField.addEventListener("keydown", (e) => {
+      const input = document.getElementById("user-input");
+      input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           executeSend();
         }
       });
-
-      if (speakBtn) {
-        speakBtn.addEventListener("click", startVoiceInput);
-      }
     });
 
     async function executeSend() {
@@ -403,7 +354,6 @@
       const text = inputField.value.trim();
       if (!text) return;
 
-      // 1. Immediately visually lock and render
       inputField.value = "";
       inputField.disabled = true;
       sendButton.disabled = true;
@@ -423,7 +373,6 @@
       chatBox.appendChild(aiBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // 2. Transmit to backend
       try {
         const response = await fetch(API_ENDPOINT, {
           method: "POST",
@@ -432,7 +381,7 @@
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -457,7 +406,6 @@
           aiBubble.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
         }
 
-        // Action Toolbar: Download Tool + Read Aloud
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "actions-bar";
 
@@ -475,9 +423,8 @@
         actionsDiv.appendChild(readBtn);
         aiBubble.appendChild(actionsDiv);
 
-        // Safe KaTeX rendering without crashing script
-        try {
-          if (window.renderMathInElement) {
+        if (window.renderMathInElement) {
+          try {
             renderMathInElement(aiBubble, {
               delimiters: [
                 { left: "$$", right: "$$", display: true },
@@ -485,16 +432,14 @@
               ],
               throwOnError: false
             });
-          }
-        } catch (mErr) {
-          console.warn("Math rendering skipped:", mErr);
+          } catch(e) {}
         }
 
       } catch (err) {
         aiBubble.innerHTML = `
-          <div class="ai-tag" style="color: #f87171;">⚠️ Connection Notice</div>
+          <div class="ai-tag" style="color: #f87171;">⚠ Connection Notice</div>
           <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
-          <i>Note: If Render put the instance to sleep, it takes ~35 seconds on the first request to wake up. Please wait 15 seconds and try sending again.</i></div>
+          <i>If the Render backend was asleep, please allow ~30 seconds for the free tier to spin up, then click Send again.</i></div>
         `;
       } finally {
         inputField.disabled = false;
@@ -504,9 +449,6 @@
       }
     }
 
-    /* =========================================================
-       3. DOWNLOAD TOOL EXPORTER (.c, .py, or .md)
-       ========================================================= */
     function downloadAITool(fullContent, promptTopic) {
       let ext = "txt";
       let codeMatch = fullContent.match(/```(c|cpp|python|js|bash)?\s*([\s\S]*?)```/);
@@ -546,26 +488,70 @@
       URL.revokeObjectURL(url);
     }
 
+    function startVoiceInput() {
+      const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechClass) {
+        alert("Your browser does not support Speech Recognition. Please use Chrome or Edge.");
+        return;
+      }
+
+      const recog = new SpeechClass();
+      recog.continuous = false;
+      recog.interimResults = false;
+      recog.lang = "en-US";
+
+      const speakBtn = document.getElementById("speak-btn");
+      speakBtn.innerText = "🎙 Listening...";
+
+      recog.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        document.getElementById("user-input").value = transcript;
+        speakBtn.innerText = "🎤 Speak";
+        executeSend();
+      };
+
+      recog.onerror = (e) => {
+        speakBtn.innerText = "🎤 Speak";
+        alert("Microphone Error: " + e.error);
+      };
+
+      recog.onend = () => {
+        speakBtn.innerText = "🎤 Speak";
+      };
+
+      recog.start();
+    }
+
     function speakText(content) {
       window.speechSynthesis.cancel();
-      const clean = content.replace(/\\$+/g, '').replace(/[*_#`]/g, '');
+      const clean = content.replace(/\$/g, '').replace(/[*_#`]/g, '');
       const utter = new SpeechSynthesisUtterance(clean);
       utter.rate = 1.0;
       window.speechSynthesis.speak(utter);
     }
 
-    function startVoiceInput() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recog = new SR();
-        recog.onresult = (e) => {
-          document.getElementById("user-input").value = e.results[0][0].transcript;
-          executeSend();
-        };
-        recog.start();
-      } else {
-        alert("Speech Recognition is not supported by your browser.");
-      }
+    let player;
+    function onYouTubeIframeAPIReady() {
+      try {
+        player = new YT.Player('bg-player', {
+          events: {
+            onReady: (event) => {
+              event.target.mute();
+              event.target.seekTo(4, true);
+              event.target.playVideo();
+              setInterval(() => {
+                if (player && player.getCurrentTime) {
+                  const cur = player.getCurrentTime();
+                  if (cur >= 60 || cur < 4) {
+                    player.seekTo(4, true);
+                    player.playVideo();
+                  }
+                }
+              }, 300);
+            }
+          }
+        });
+      } catch(e) {}
     }
   </script>
 </body>
