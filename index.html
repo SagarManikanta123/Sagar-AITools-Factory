@@ -1,11 +1,3 @@
-Uncaught SyntaxError: Invalid regular expression: /\\$+/g: Nothing to repeat
-```
-
-In JavaScript, `/\\$+/` treats `$` as an end-of-line anchor rather than a dollar sign, making `+` invalid and throwing a **SyntaxError**. Because a syntax error stops script parsing immediately, **the browser halted the entire script before registering the Send and Speak button click listeners**[cite: 14].
-
-Here is the clean, working **`index.html`** with that syntax error fixed:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -278,7 +270,6 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
 </head>
 <body>
 
-  <!-- Background Video -->
   <div class="video-background">
     <iframe 
       id="bg-player"
@@ -304,13 +295,13 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
       <div>
         Welcome to <b>Sagar'AI factory</b>.
         <br><br>
-        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand. Every tool generated can be exported and downloaded directly.
+        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand. Every tool generated can be exported and downloaded directly as an executable Python script.
         <br><br>
         <b>Examples to try:</b>
         <ul style="margin-left: 20px; margin-top: 8px;">
-          <li><i>"Build an AI Resume Screener tool with prompt and Python script"</i></li>
-          <li><i>"Make an AI to write C codes"</i></li>
-          <li><i>"Solve \int x^2 \sin(x) dx with step-by-step notebook math"</i></li>
+          <li><i>"Build an AI Resume Screener tool"</i></li>
+          <li><i>"Make an AI tool to write C code"</i></li>
+          <li><i>"Make an AI tool that creates PDFs based on user input"</i></li>
           <li><i>"Plot a 3D surface mesh plot"</i></li>
         </ul>
       </div>
@@ -325,12 +316,9 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
     </div>
   </footer>
 
-  <!-- Safe KaTeX Library -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
-
-  <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
@@ -368,7 +356,7 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
       aiBubble.className = "ai-bubble";
       aiBubble.innerHTML = `
         <div class="ai-tag">⚙ Sagar'AI Manufacturing Core Active...</div>
-        <div>Architecting tool system logic, instructions & downloadable payload...</div>
+        <div>Manufacturing standalone AI tool script and interactive runner...</div>
       `;
       chatBox.appendChild(aiBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -379,10 +367,6 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text })
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
 
         const data = await response.json();
         const rawContent = data.text || "Tool manufactured successfully.";
@@ -411,7 +395,7 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
 
         const downloadBtn = document.createElement("button");
         downloadBtn.className = "btn-action btn-download";
-        downloadBtn.innerHTML = "📥 Download AI Tool";
+        downloadBtn.innerHTML = "📥 Download AI Tool (.py)";
         downloadBtn.onclick = () => downloadAITool(rawContent, text);
 
         const readBtn = document.createElement("button");
@@ -437,9 +421,9 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
 
       } catch (err) {
         aiBubble.innerHTML = `
-          <div class="ai-tag" style="color: #f87171;">⚠ Connection Notice</div>
+          <div class="ai-tag" style="color: #f87171;">⚠️ Connection Notice</div>
           <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
-          <i>If the Render backend was asleep, please allow ~30 seconds for the free tier to spin up, then click Send again.</i></div>
+          <i>If the Render backend is waking up, please wait 15 seconds and try again.</i></div>
         `;
       } finally {
         inputField.disabled = false;
@@ -450,34 +434,26 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
     }
 
     function downloadAITool(fullContent, promptTopic) {
-      let ext = "txt";
-      let codeMatch = fullContent.match(/```(c|cpp|python|js|bash)?\s*([\s\S]*?)```/);
+      const pyMatches = fullContent.match(/```python([\s\S]*?)```/);
+      let filename = "manufactured_ai_tool.py";
       let fileData = "";
 
-      if (codeMatch && codeMatch[2]) {
-        const lang = (codeMatch[1] || "").toLowerCase();
-        if (lang === "c" || lang === "cpp") ext = "c";
-        else if (lang === "python") ext = "py";
-        else ext = "txt";
-
-        fileData = `/* ==========================================================\n` +
-                   ` * MANUFACTURED BY: Sagar'AI factory\n` +
-                   ` * Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
-                   ` * Co-Founder: J.Y.N.V.Subhash\n` +
-                   ` * Prompt: ${promptTopic}\n` +
-                   ` * ========================================================== */\n\n` +
-                   codeMatch[2].trim() + "\n";
+      if (pyMatches && pyMatches[1]) {
+        fileData = `"""\n` +
+                   `===============================================================\n` +
+                   `MANUFACTURED BY: Sagar'AI factory\n` +
+                   `Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
+                   `Co-Founder: J.Y.N.V.Subhash\n` +
+                   `Tool Request: ${promptTopic}\n` +
+                   `===============================================================\n` +
+                   `"""\n\n` +
+                   pyMatches[1].trim() + "\n";
       } else {
-        ext = "md";
-        fileData = `# MANUFACTURED BY: Sagar'AI factory\n` +
-                   `# Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
-                   `# Co-Founder: J.Y.N.V.Subhash\n` +
-                   `# Prompt: ${promptTopic}\n\n` +
-                   fullContent;
+        filename = "manufactured_tool_instructions.md";
+        fileData = fullContent;
       }
 
-      const filename = `manufactured_ai_tool.${ext}`;
-      const blob = new Blob([fileData], { type: "text/plain;charset=utf-8" });
+      const blob = new Blob([fileData], { type: "text/x-python;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -488,38 +464,50 @@ Here is the clean, working **`index.html`** with that syntax error fixed:
       URL.revokeObjectURL(url);
     }
 
+    let recognition = null;
     function startVoiceInput() {
       const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechClass) {
-        alert("Your browser does not support Speech Recognition. Please use Chrome or Edge.");
+        alert("Your browser does not support Speech Recognition. Please use Google Chrome.");
         return;
       }
 
-      const recog = new SpeechClass();
-      recog.continuous = false;
-      recog.interimResults = false;
-      recog.lang = "en-US";
-
       const speakBtn = document.getElementById("speak-btn");
+
+      if (recognition) {
+        try { recognition.abort(); } catch(e) {}
+      }
+
+      recognition = new SpeechClass();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
       speakBtn.innerText = "🎙 Listening...";
 
-      recog.onresult = (e) => {
+      recognition.onresult = (e) => {
         const transcript = e.results[0][0].transcript;
         document.getElementById("user-input").value = transcript;
         speakBtn.innerText = "🎤 Speak";
         executeSend();
       };
 
-      recog.onerror = (e) => {
+      recognition.onerror = (e) => {
         speakBtn.innerText = "🎤 Speak";
-        alert("Microphone Error: " + e.error);
+        if (e.error !== 'aborted' && e.error !== 'no-speech') {
+          console.warn("Speech warning:", e.error);
+        }
       };
 
-      recog.onend = () => {
+      recognition.onend = () => {
         speakBtn.innerText = "🎤 Speak";
       };
 
-      recog.start();
+      try {
+        recognition.start();
+      } catch (err) {
+        speakBtn.innerText = "🎤 Speak";
+      }
     }
 
     function speakText(content) {
