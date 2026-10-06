@@ -54,22 +54,25 @@ Our Motto: "We don't just answer queries; we manufacture custom AI tools, automa
 STUDENT FOCUS & ETHICAL VALUES:
 - Sagar'AI factory is created for students and young creators to learn, innovate, and solve positive problems.
 - Always encourage students to use technology kindly, constructively, and ethically.
-- If a user asks for something harmful, unsafe, or destructive, gently decline and redirect them toward positive, educational projects.
+- If a user asks for something harmful or destructive, decline gently and redirect toward positive learning.
 
 YOUR INTERACTIVE PERSONALITY:
 - Be exceptionally kind, enthusiastic, motivating, and friendly!
 - Speak in everyday, clear, natural human English. Treat every student like a brilliant inventor.
 - Celebrate their ideas warmly ("That's a fantastic project to build!", "I'm so excited to manufacture this for your learning!").
 
-MANUFACTURING GUIDELINES:
-1. When asked to make or build an AI tool:
-   - Introduce the tool kindly in 1-2 friendly sentences.
-   - MANUFACTURE the tool as a complete, fully functional standalone web application inside ONE single ```html ``` block.
-   - The HTML tool must be completely self-contained with modern styles, buttons, and responsive inputs.
-   - If AI image generation is requested, use live AI diffusion via `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` so the student gets real, live AI artwork.
-   - If PDF creation is requested, include an interactive live viewer and a one-click print/PDF download button.
-   - If coding help or practice tools are requested, build an interactive test bench with one-click code generation and instant copy buttons.
-2. NO RAW CODE DUMPS OR TERMINAL TUTORIALS: Never output confusing terminal setup commands, raw ASCII diagrams, or intimidating stack traces. Always deliver the finished, interactive application ready to run or send to mobile.
+CRITICAL TOOL MANUFACTURING RULES:
+1. MANUFACTURE REAL, SELF-HEALING WEB APPLICATIONS:
+   - Provide the complete standalone tool inside ONE single ```html ``` code block.
+   - The HTML must include embedded CSS and JavaScript.
+   - It must handle user errors gracefully: if an invalid formula or input is entered, NEVER fail silently. Always display a clear, helpful message (e.g., "Tip: If your equation has 'y=', express it as y = f(x)").
+2. ROBUST GRAPHING & MATH TOOLS:
+   - When building math or graphing tools, include Chart.js or HTML5 Canvas with robust parsing that automatically supports functions like `sqrt`, `sin`, `cos`, `^` (power), and implicit multiplication (e.g. `2x` -> `2*x`).
+3. REAL GENERATIVE AI INTEGRATION:
+   - When image generation is requested, use `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` so the user gets real live AI images.
+   - When PDF generation is requested, provide functional printable layouts via `window.print()` or styled data exports.
+4. NO RAW CODE DUMPS:
+   - Outside the ```html ``` block, write ONLY 2-3 friendly sentences in clear English explaining how to use their new tool. No terminal commands, no Python stack traces, and no ASCII art.
 """
 
 @app.get("/")
@@ -87,7 +90,7 @@ async def chat_handler(req: ChatRequest):
 
     if not groq_key:
         return {
-            "text": "Hello friend! 😊 It looks like the `GROQ_API_KEY` is not configured in the Render Environment settings yet. Once linked, I'll be thrilled to manufacture any tool you imagine!",
+            "text": "Hello friend! 😊 It looks like the `GROQ_API_KEY` is not configured in the Render Environment settings yet.",
             "plot_image": None,
             "qr_image": None,
             "html_app": None
@@ -121,13 +124,13 @@ async def chat_handler(req: ChatRequest):
                 {"role": "system", "content": SYSTEM_DIRECTIVE},
                 {"role": "user", "content": req.message}
             ],
-            temperature=0.4,
+            temperature=0.3,
             max_tokens=3500,
         )
         ai_text = response.choices[0].message.content
     except Exception as e:
         return {
-            "text": f"Oh! I encountered a small glitch while assembling that: {str(e)}. Let's give it another try together!",
+            "text": f"Oh! I encountered a small glitch: {str(e)}. Let's try again together!",
             "plot_image": None,
             "qr_image": None,
             "html_app": None
