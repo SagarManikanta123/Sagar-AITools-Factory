@@ -51,24 +51,23 @@ SYSTEM_DIRECTIVE = """
 You are the manufacturing core of "Sagar'AI factory", founded by Founder & CEO SAGAR MANIKANTA CHOUDHARI and Co-Founder J.Y.N.V.Subhash.
 Our Motto: "We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions."
 
-CORE IDENTITY AND PURPOSE:
-When a user asks you to build or make an AI tool, your sole job is to MANUFACTURE THAT EXACT AI TOOL as a complete, fully functioning, ready-to-run Python program.
+MANDATORY RULES:
+1. NEVER OUTPUT TERMINAL TUTORIALS, RAW CODE SNIPPETS, OR PYTHON PACKAGING GUIDES TO THE USER.
+   - The user does not want terminal scripts or `pip install` commands.
+   - The user wants a REAL, FINISHED, WORKING TOOL they can use immediately.
 
-CRITICAL RULES FOR MANUFACTURED PRODUCTS:
-1. NO PLACEHOLDERS, NO CHEATING, NO STOCK PHOTOS:
-   - If the user asks for AI-generated images, the manufactured tool MUST actually generate images using generative AI (for example, by calling `https://image.pollinations.ai/prompt/{url_encoded_prompt}` which returns live AI diffusion-generated images with zero API key requirement). Never substitute stock photos (like Unsplash).
-   - If the user asks for an AI code writer, resume screener, or summarizer, the tool MUST include real AI logic (or free inference calls via Groq/HuggingFace/transformers/regex heuristics) that actually performs the task.
-2. SPEAK IN NATURAL, DIRECT HUMAN ENGLISH:
-   - Explain what the tool does simply and clearly.
-   - Do NOT output ASCII box architecture diagrams or test-framework jargon.
-3. THE EXECUTABLE AI TOOL CODE:
-   - Provide the complete, working code in ONE single ```python ``` block.
-   - Must include an interactive terminal menu inside `if __name__ == '__main__':` so running `python manufactured_ai_tool.py` immediately gives the user an interactive working software application.
-   - Must handle errors gracefully (e.g. saving files locally, displaying progress).
-4. RESPONSE FORMAT:
-   - **Tool Overview:** 2 to 3 sentences explaining the tool and how it works.
-   - **Manufactured Tool Source Code:** The single complete ```python ``` code block.
-   - **How to Run:** The exact pip install command and run command.
+2. MANUFACTURE EVERY TOOL AS A COMPLETE STANDALONE WEB APPLICATION:
+   - Provide a complete HTML file inside a single ```html ``` code block.
+   - The HTML must include its own embedded CSS and JavaScript.
+   - It must have a clean, modern UI (dark mode with clear buttons, inputs, and results area).
+   - If image generation is requested, the application's JavaScript must generate real AI images using `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` and display them immediately.
+   - If PDF generation is requested, use standard client-side PDF generation or printable styled window views (`window.print()`).
+   - If C code generation is requested, it must have an interactive prompt where users type ideas and get instant formatted C code with a 1-click copy button.
+
+3. RESPONSE FORMAT:
+   - Exactly 2 sentences in natural, plain human English explaining what tool was manufactured.
+   - The single complete ```html ``` code block containing the full interactive tool.
+   - No markdown checklists, no ASCII architecture art, and no terminal installation steps.
 """
 
 @app.get("/")
@@ -87,7 +86,8 @@ async def chat_handler(req: ChatRequest):
         return {
             "text": "⚠️ **Configuration Notice:** `GROQ_API_KEY` is not set in Render Environment variables.",
             "plot_image": None,
-            "qr_image": None
+            "qr_image": None,
+            "html_app": None
         }
 
     client = Groq(api_key=groq_key)
@@ -126,9 +126,19 @@ async def chat_handler(req: ChatRequest):
         return {
             "text": f"⚠️ **Engine Error:** {str(e)}",
             "plot_image": None,
-            "qr_image": None
+            "qr_image": None,
+            "html_app": None
         }
 
+    # Extract standalone HTML application if generated
+    html_app = None
+    html_match = re.search(r"```html\s*([\s\S]*?)\s*```", ai_text)
+    if html_match:
+        html_app = html_match.group(1).strip()
+        # Clean text so the user only reads the clean human overview
+        ai_text = re.sub(r"```html[\s\S]*?```", "", ai_text).strip()
+
+    # Autonomous Plot Handling
     plot_image = None
     py_blocks = re.findall(r"```python\s*(.*?)\s*```", ai_text, re.DOTALL)
     for block in py_blocks:
@@ -139,18 +149,11 @@ async def chat_handler(req: ChatRequest):
             except Exception:
                 pass
 
-    qr_image = None
-    qr_match = re.search(r"GENERATE_QR:\s*(\S+)", ai_text)
-    if qr_match:
-        target = qr_match.group(1).strip()
-        try:
-            qr_image = generate_qr_base64(target)
-            ai_text = re.sub(r"GENERATE_QR:\s*\S+", "", ai_text).strip()
-        except Exception:
-            pass
+    # Clean legacy markers
+    ai_text = re.sub(r"GENERATE_QR:\s*\S+", "", ai_text).strip()
 
     return {
         "text": ai_text,
         "plot_image": plot_image,
-        "qr_image": qr_image
+        "html_app": html_app
     }
