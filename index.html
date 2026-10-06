@@ -24,43 +24,14 @@
       position: relative;
     }
 
-    /* Video Background Container */
-    .video-background {
+    /* Live Animated Canvas Background */
+    #matrix-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: -2;
-      overflow: hidden;
-      pointer-events: none;
-      background: #030712;
-    }
-
-    /* Scaled up iframe to eliminate YouTube borders, controls, and letterboxing */
-    .video-background iframe,
-    .video-background #ytplayer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 56.25vw; /* 16:9 Aspect Ratio */
-      min-height: 100vh;
-      min-width: 177.77vh; /* 16:9 Aspect Ratio */
-      transform: translate(-50%, -50%) scale(1.35);
-      pointer-events: none;
-      filter: brightness(0.48) contrast(1.15);
-    }
-
-    /* Subtle high-tech gradient overlay to make all text crystal clear */
-    .video-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.35) 0%, rgba(3, 7, 18, 0.82) 100%);
-      z-index: -1;
+      z-index: 0;
       pointer-events: none;
     }
 
@@ -72,7 +43,7 @@
       border-bottom: 1px solid rgba(168, 85, 247, 0.35);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      background: rgba(15, 23, 42, 0.72);
+      background: rgba(15, 23, 42, 0.75);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
       z-index: 10;
     }
@@ -186,7 +157,7 @@
       display: flex;
       gap: 12px;
       border-top: 1px solid rgba(99, 102, 241, 0.3);
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       z-index: 10;
@@ -194,7 +165,7 @@
 
     input[type="text"] {
       flex: 1;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       border: 1px solid rgba(99, 102, 241, 0.5);
       color: #fff;
       padding: 14px 20px;
@@ -234,11 +205,8 @@
 </head>
 <body>
 
-  <!-- Dynamic YouTube Background with fallback iframe -->
-  <div class="video-background">
-    <div id="ytplayer"></div>
-  </div>
-  <div class="video-overlay"></div>
+  <!-- Full-Screen Interactive Neural Background Canvas -->
+  <canvas id="matrix-canvas"></canvas>
 
   <header>
     <div class="brand-title">Sagar'AI factory</div>
@@ -274,72 +242,101 @@
     <button class="btn" onclick="sendPrompt()">Send ➔</button>
   </footer>
 
-  <!-- YouTube IFrame API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
-
   <script>
-    const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
+    /* =========================================================
+       HIGH-TECH NEURAL FOUNDRY ANIMATED CANVAS BACKGROUND
+       ========================================================= */
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
 
-    // Playback range: strictly 4s to 60s (1 minute) loop
-    const VIDEO_ID = 'u83VdXAVq08';
-    const START_TIME = 4;
-    const END_TIME = 60;
-    let player;
-    let loopInterval;
+    let width, height;
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('ytplayer', {
-        videoId: VIDEO_ID,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          controls: 0,
-          showinfo: 0,
-          rel: 0,
-          modestbranding: 1,
-          disablekb: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          start: START_TIME,
-          end: END_TIME,
-          playsinline: 1,
-          enablejsapi: 1
-        },
-        events: {
-          onReady: (event) => {
-            event.target.mute();
-            event.target.seekTo(START_TIME, true);
-            event.target.playVideo();
-            
-            // Sub-second monitoring to loop back once it hits 60s
-            if (loopInterval) clearInterval(loopInterval);
-            loopInterval = setInterval(() => {
-              if (player && player.getCurrentTime) {
-                const currentTime = player.getCurrentTime();
-                if (currentTime >= END_TIME || currentTime < START_TIME) {
-                  player.seekTo(START_TIME, true);
-                }
-              }
-            }, 200);
-          },
-          onStateChange: (event) => {
-            if (event.data === YT.PlayerState.ENDED) {
-              player.seekTo(START_TIME, true);
-              player.playVideo();
-            }
-          }
-        }
+    const particles = [];
+    const PARTICLE_COUNT = 65;
+    const CONNECT_DIST = 140;
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.9,
+        vy: (Math.random() - 0.5) * 0.9,
+        radius: Math.random() * 2.2 + 1.2,
+        color: i % 2 === 0 ? '#38bdf8' : '#c084fc'
       });
     }
 
-    // Fallback: If browser delays autoplay until first click, start immediately on first user interaction
-    window.addEventListener('click', () => {
-      if (player && player.getPlayerState && player.getPlayerState() !== YT.PlayerState.PLAYING) {
-        player.mute();
-        player.seekTo(START_TIME, true);
-        player.playVideo();
+    let mouse = { x: -1000, y: -1000 };
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function animate() {
+      // Dynamic dark space fade
+      ctx.fillStyle = 'rgba(3, 7, 18, 0.25)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw and connect particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        // Draw node
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = p.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Connect with nearby nodes
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < CONNECT_DIST) {
+            const alpha = 1 - dist / CONNECT_DIST;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha * 0.28})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // Mouse interaction attraction
+        const mdx = mouse.x - p.x;
+        const mdy = mouse.y - p.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < 180) {
+          p.x += mdx * 0.012;
+          p.y += mdy * 0.012;
+        }
       }
-    }, { once: true });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* =========================================================
+       CHAT & BACKEND LOGIC
+       ========================================================= */
+    const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
 
     async function sendPrompt() {
       const input = document.getElementById("user-input");
