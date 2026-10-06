@@ -8,12 +8,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from typing import List, Dict, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 
-app = FastAPI(title="Sagar'AI factory Engine")
+app = FastAPI(title="Sagar'AI factory Engine with Memory")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,8 +24,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
 class ChatRequest(BaseModel):
     message: str
+    history: Optional[List[ChatMessage]] = []
 
 def generate_qr_base64(data: str) -> str:
     qr = qrcode.QRCode(box_size=8, border=2)
@@ -56,20 +62,24 @@ STUDENT FOCUS & ETHICAL VALUES:
 - Always encourage students to use technology kindly, constructively, and ethically.
 - If a user asks for something harmful or destructive, decline gently and redirect toward positive learning.
 
+MEMORY & CONVERSATION AWARENESS:
+- You retain context of all previous tools, modifications, and conversations in this session.
+- When the user asks for updates, refinements, or modifications (e.g., "Add another button", "Make it in Telugu", "Change colors", "Add feature X"), reference the previous tool and manufacture the upgraded version with all requested changes integrated.
+
 BILINGUAL (TELUGU & ENGLISH) INTELLIGENCE:
 1. DETECT USER LANGUAGE:
-   - If the user enters Telugu (in Telugu script or spoken Telugu transcription like "నాకు ఒక టూల్ కావాలి", "గ్రాఫ్ గీసే AI చేయండి", etc.):
+   - If the user enters Telugu (in Telugu script or spoken Telugu transcription like "నాకు ఒక టూల్ కావాలి", "మార్పు చేయండి", etc.):
      * Speak and respond ENTIRELY in fluent, kind, and encouraging Telugu (తెలుగు).
-     * The manufactured web tool interface (headings, buttons, placeholders, results) inside the ```html ``` block MUST be in Telugu so the user can easily use it.
+     * The manufactured web tool interface (headings, buttons, placeholders, results) inside the ```html ``` block MUST be in Telugu.
    - If the user enters English, reply and manufacture the tool in English.
 
 MANUFACTURING GUIDELINES:
-1. Introduce the manufactured tool in 1-2 friendly, enthusiastic sentences in the user's chosen language (Telugu or English).
+1. Introduce the manufactured tool in 1-2 friendly, enthusiastic sentences in the user's chosen language.
 2. MANUFACTURE the tool as a complete, fully functional standalone web application inside ONE single ```html ``` block.
 3. The HTML tool must be completely self-contained with modern styles, buttons, and responsive inputs.
 4. If image generation is requested, use `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` so the student gets real, live AI artwork.
 5. If PDF generation is requested, include an interactive live viewer and a one-click print/PDF download button.
-6. NO RAW CODE DUMPS: Do not give python terminal setups or complex commands. Deliver the finished, interactive web tool directly.
+6. NO RAW CODE DUMPS: Do not output terminal setups or raw tracebacks. Deliver the finished, interactive web tool directly.
 """
 
 @app.get("/")
@@ -77,6 +87,7 @@ def health():
     return {
         "status": "online",
         "platform": "Sagar'AI factory",
+        "memory_enabled": True,
         "languages": ["English", "Telugu"],
         "founders": ["SAGAR MANIKANTA CHOUDHARI", "J.Y.N.V.Subhash"]
     }
@@ -89,7 +100,6 @@ async def chat_handler(req: ChatRequest):
         return {
             "text": "నమస్కారం! 😊 Render Environment settings లో `GROQ_API_KEY` ఇంకా సెట్ చేయలేదు. దయచేసి దాన్ని యాడ్ చేయండి.",
             "plot_image": None,
-            "qr_image": None,
             "html_app": None
         }
 
@@ -114,13 +124,19 @@ async def chat_handler(req: ChatRequest):
     except Exception:
         target_model = "openai/gpt-oss-20b"
 
+    messages = [{"role": "system", "content": SYSTEM_DIRECTIVE}]
+    
+    # Brain 34 Memory Integration: Include conversation history
+    if req.history:
+        for msg in req.history[-8:]:
+            messages.append({"role": msg.role, "content": msg.content})
+
+    messages.append({"role": "user", "content": req.message})
+
     try:
         response = client.chat.completions.create(
             model=target_model,
-            messages=[
-                {"role": "system", "content": SYSTEM_DIRECTIVE},
-                {"role": "user", "content": req.message}
-            ],
+            messages=messages,
             temperature=0.3,
             max_tokens=3500,
         )
@@ -129,7 +145,6 @@ async def chat_handler(req: ChatRequest):
         return {
             "text": f"చిన్న సాంకేతిక సమస్య వచ్చింది: {str(e)}. దయచేసి మళ్లీ ప్రయత్నించండి!",
             "plot_image": None,
-            "qr_image": None,
             "html_app": None
         }
 
