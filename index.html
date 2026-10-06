@@ -14,24 +14,51 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     
-    body {
-      background-color: #030712;
-      color: #f1f5f9;
+    html, body {
+      width: 100%;
       height: 100vh;
+      overflow: hidden;
+      background: transparent;
+      color: #f1f5f9;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      position: relative;
     }
 
-    /* Live Animated Canvas Background */
-    #matrix-canvas {
+    /* FULLSCREEN YOUTUBE BACKGROUND WRAPPER */
+    .video-background {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 0;
+      z-index: -10;
+      overflow: hidden;
+      pointer-events: none;
+      background: #000;
+    }
+
+    .video-background iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 56.25vw; /* 16:9 ratio */
+      min-height: 100vh;
+      min-width: 177.77vh; /* 16:9 ratio */
+      transform: translate(-50%, -50%) scale(1.35);
+      border: none;
+      pointer-events: none;
+    }
+
+    /* Cinematic semi-transparent tint overlay so text and UI pop cleanly */
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(3, 7, 18, 0.78) 100%);
+      z-index: -5;
       pointer-events: none;
     }
 
@@ -41,8 +68,8 @@
       flex-direction: column;
       gap: 6px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.35);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       background: rgba(15, 23, 42, 0.75);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
       z-index: 10;
@@ -205,8 +232,16 @@
 </head>
 <body>
 
-  <!-- Full-Screen Interactive Neural Background Canvas -->
-  <canvas id="matrix-canvas"></canvas>
+  <!-- Fullscreen Animated Video Background (4s to 60s) -->
+  <div class="video-background">
+    <iframe 
+      id="bg-player"
+      src="https://www.youtube.com/embed/u83VdXAVq08?enablejsapi=1&autoplay=1&mute=1&controls=0&loop=1&playlist=u83VdXAVq08&start=4&end=60&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+  <div class="video-overlay"></div>
 
   <header>
     <div class="brand-title">Sagar'AI factory</div>
@@ -242,96 +277,51 @@
     <button class="btn" onclick="sendPrompt()">Send ➔</button>
   </footer>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     /* =========================================================
-       HIGH-TECH NEURAL FOUNDRY ANIMATED CANVAS BACKGROUND
+       SEAMLESS YOUTUBE 4s -> 60s LOOP CONTROLLER
        ========================================================= */
-    const canvas = document.getElementById('matrix-canvas');
-    const ctx = canvas.getContext('2d');
+    let player;
+    const START_TIME = 4;
+    const END_TIME = 60;
 
-    let width, height;
-    function resizeCanvas() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('bg-player', {
+        events: {
+          onReady: (event) => {
+            event.target.mute();
+            event.target.seekTo(START_TIME, true);
+            event.target.playVideo();
 
-    const particles = [];
-    const PARTICLE_COUNT = 65;
-    const CONNECT_DIST = 140;
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.9,
-        vy: (Math.random() - 0.5) * 0.9,
-        radius: Math.random() * 2.2 + 1.2,
-        color: i % 2 === 0 ? '#38bdf8' : '#c084fc'
+            // Precise timer to monitor and rewind back to 4 seconds
+            setInterval(() => {
+              if (player && player.getCurrentTime) {
+                const cur = player.getCurrentTime();
+                if (cur >= END_TIME || cur < START_TIME) {
+                  player.seekTo(START_TIME, true);
+                  player.playVideo();
+                }
+              }
+            }, 300);
+          },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.ENDED) {
+              player.seekTo(START_TIME, true);
+              player.playVideo();
+            }
+          }
+        }
       });
     }
 
-    let mouse = { x: -1000, y: -1000 };
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-
-    function animate() {
-      // Dynamic dark space fade
-      ctx.fillStyle = 'rgba(3, 7, 18, 0.25)';
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw and connect particles
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        // Draw node
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = p.color;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // Connect with nearby nodes
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < CONNECT_DIST) {
-            const alpha = 1 - dist / CONNECT_DIST;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha * 0.28})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-
-        // Mouse interaction attraction
-        const mdx = mouse.x - p.x;
-        const mdy = mouse.y - p.y;
-        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mdist < 180) {
-          p.x += mdx * 0.012;
-          p.y += mdy * 0.012;
-        }
+    // Auto unpause on first interaction if Chrome tries to freeze autoplay
+    window.addEventListener('click', () => {
+      if (player && player.playVideo) {
+        player.mute();
+        player.playVideo();
       }
-
-      requestAnimationFrame(animate);
-    }
-    animate();
+    }, { once: true });
 
     /* =========================================================
        CHAT & BACKEND LOGIC
