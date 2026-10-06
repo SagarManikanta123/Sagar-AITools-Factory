@@ -16,17 +16,39 @@
     
     body {
       background-color: #070913;
-      background-image: 
-        radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.28) 0%, transparent 45%),
-        radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 50% 85%, rgba(14, 165, 233, 0.25) 0%, transparent 55%),
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 100% 100%, 35px 35px, 35px 35px;
       color: #f1f5f9;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Video Background Container */
+    #bg-video {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -2;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      filter: brightness(0.38) contrast(1.15) saturate(1.2);
+    }
+
+    /* Overlay Layer for Readability */
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(7, 9, 19, 0.85) 100%);
+      z-index: -1;
+      pointer-events: none;
     }
 
     header {
@@ -35,10 +57,11 @@
       flex-direction: column;
       gap: 6px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.35);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(15, 23, 42, 0.72);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      z-index: 10;
     }
 
     .brand-title {
@@ -53,7 +76,7 @@
 
     .brand-motto {
       font-size: 0.88rem;
-      color: #94a3b8;
+      color: #cbd5e1;
       font-weight: 500;
       letter-spacing: 0.4px;
     }
@@ -98,29 +121,34 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
+      z-index: 5;
     }
 
     .user-bubble {
       align-self: flex-end;
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
+      background: rgba(30, 41, 59, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(56, 189, 248, 0.7);
       border-right: 4px solid #38bdf8;
       border-radius: 18px 4px 18px 18px;
       padding: 14px 22px;
       max-width: 75%;
-      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.2);
     }
 
     .ai-bubble {
       align-self: flex-start;
-      background: linear-gradient(135deg, rgba(20, 24, 48, 0.88), rgba(15, 23, 42, 0.94));
-      border: 1px solid rgba(168, 85, 247, 0.5);
+      background: rgba(20, 24, 48, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.55);
       border-left: 4px solid #e879f9;
       border-radius: 4px 20px 20px 20px;
       padding: 18px 26px;
       max-width: 82%;
       line-height: 1.65;
-      box-shadow: 0 10px 35px rgba(168, 85, 247, 0.25);
+      box-shadow: 0 10px 35px rgba(168, 85, 247, 0.22);
     }
 
     .ai-tag {
@@ -145,14 +173,16 @@
       display: flex;
       gap: 12px;
       border-top: 1px solid rgba(99, 102, 241, 0.3);
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 10;
     }
 
     input[type="text"] {
       flex: 1;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(99, 102, 241, 0.45);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(99, 102, 241, 0.5);
       color: #fff;
       padding: 14px 20px;
       border-radius: 12px;
@@ -162,7 +192,7 @@
 
     input[type="text"]:focus {
       border-color: #e879f9;
-      box-shadow: 0 0 15px rgba(232, 121, 249, 0.3);
+      box-shadow: 0 0 15px rgba(232, 121, 249, 0.35);
     }
 
     .btn {
@@ -180,7 +210,7 @@
     .btn:active { transform: scale(0.97); }
 
     .btn-voice-read {
-      background: #1e293b;
+      background: rgba(30, 41, 59, 0.85);
       border: 1px solid #c084fc;
       color: #c084fc;
       margin-top: 10px;
@@ -190,6 +220,12 @@
   </style>
 </head>
 <body>
+
+  <!-- Video Background Element -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-blue-and-purple-screens-99742-large.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
 
   <header>
     <div class="brand-title">Sagar'AI factory</div>
