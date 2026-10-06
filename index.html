@@ -29,7 +29,6 @@
       flex-direction: column;
     }
 
-    /* Video Background Container (Retained Exactly) */
     .video-background {
       position: fixed;
       top: 0;
@@ -55,7 +54,6 @@
       pointer-events: none;
     }
 
-    /* Vibrant Multi-Color Aurora Glassmorphism Overlay */
     .video-overlay {
       position: fixed;
       top: 0;
@@ -69,7 +67,6 @@
       pointer-events: none;
     }
 
-    /* Top Kind-Usage Student Banner */
     .student-guidance-banner {
       position: relative;
       z-index: 30;
@@ -285,7 +282,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.25s ease;
     }
 
     .btn-action:hover {
@@ -299,9 +296,7 @@
       color: #fff;
     }
 
-    .btn-run:hover {
-      box-shadow: 0 8px 22px var(--primary-glow);
-    }
+    .btn-run:hover { box-shadow: 0 8px 22px var(--primary-glow); }
 
     .btn-mobile {
       background: linear-gradient(90deg, #059669, #10b981);
@@ -309,14 +304,12 @@
       color: #fff;
     }
 
-    .btn-mobile:hover {
-      box-shadow: 0 8px 22px rgba(52, 211, 153, 0.4);
-    }
+    .btn-mobile:hover { box-shadow: 0 8px 22px rgba(52, 211, 153, 0.4); }
 
     footer {
       position: relative;
       z-index: 25;
-      padding: 18px 28px;
+      padding: 16px 24px;
       border-top: 1px solid var(--border-glow);
       background: var(--bg-glass);
       backdrop-filter: blur(20px);
@@ -325,8 +318,9 @@
 
     .input-row {
       display: flex;
-      gap: 14px;
+      gap: 10px;
       width: 100%;
+      align-items: center;
     }
 
     #user-input {
@@ -334,10 +328,10 @@
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid rgba(99, 102, 241, 0.5);
       color: #fff;
-      padding: 15px 22px;
+      padding: 14px 20px;
       border-radius: 14px;
       outline: none;
-      font-size: 1.02rem;
+      font-size: 1rem;
       transition: all 0.2s ease;
     }
 
@@ -350,18 +344,28 @@
       background: linear-gradient(135deg, #0284c7, #9333ea);
       color: #fff;
       border: none;
-      padding: 12px 26px;
+      padding: 12px 20px;
       border-radius: 14px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       cursor: pointer;
       box-shadow: 0 4px 18px rgba(147, 51, 234, 0.4);
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
     .btn-main:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(2, 132, 199, 0.5);
+    }
+
+    .btn-telugu-mic {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      box-shadow: 0 4px 18px rgba(234, 88, 12, 0.4);
+    }
+
+    .btn-telugu-mic:hover {
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
     }
 
     .btn-main:active { transform: scale(0.97); }
@@ -419,7 +423,6 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
-      transition: background 0.2s ease;
     }
 
     .modal-close:hover { background: #dc2626; }
@@ -472,7 +475,6 @@
 </head>
 <body>
 
-  <!-- Fullscreen Background Video -->
   <div class="video-background">
     <iframe 
       id="bg-player"
@@ -483,7 +485,6 @@
   </div>
   <div class="video-overlay"></div>
 
-  <!-- Top Kind-Usage Student Guidance Banner -->
   <div class="student-guidance-banner">
     <span class="banner-pill">🎓 Student Innovation Hub</span>
     <span>Sagar'AI factory is created for students to learn, invent, and create positive solutions. Please use this platform with kindness, integrity, and respect. Strictly not for harmful or unethical activities.</span>
@@ -504,20 +505,20 @@
 
   <div id="chat-box">
     <div class="ai-bubble">
-      <div class="ai-tag">✨ Welcome to Your AI Workshop!</div>
+      <div class="ai-tag">✨ Welcome to Sagar'AI Factory! / సాగర్స్ AI ఫ్యాక్టరీకి స్వాగతం!</div>
       <div>
-        Hello and welcome! 😊 We are delighted to collaborate with you here at <b>Sagar'AI factory</b>.
+        Hello students and creators! నమస్కారం! 😊 
         <br><br>
-        This factory is your creative student lab. Tell us what AI tool, automation, study companion, or generator you would like to bring to life, and we will manufacture it for you on demand!
+        This factory is your innovation workshop. Whatever AI tool, study companion, calculator, or generator you need, we manufacture it instantly in <b>English</b> or <b>తెలుగు (Telugu)</b>!
         <br><br>
-        Once manufactured, you can <b>use it right here inside your screen</b> or <b>beam it straight to your mobile device via QR code</b>.
+        Once ready, you can <b>use it right here on your screen</b> or <b>open it on mobile via QR code</b>.
         <br><br>
-        <i>What wonderful project should we invent together today? Click an idea or speak your thoughts:</i>
+        <i>What would you like to build? Click an idea or speak in English or Telugu:</i>
         <div class="quick-chips">
+          <button class="chip-btn" onclick="sendQuickPrompt('గణిత సమీకరణాలను గీసే సులభమైన గ్రాఫ్ ప్లాటర్ టూల్ తయారు చేయండి')">📊 తెలుగు గ్రాఫ్ ప్లాటర్</button>
           <button class="chip-btn" onclick="sendQuickPrompt('Make an AI tool that creates PDFs with real AI images based on my notes')">🎨 AI PDF & Image Creator</button>
-          <button class="chip-btn" onclick="sendQuickPrompt('Build an AI C Code Assistant that generates, explains, and tests C programs')">💻 AI C Code Practice Tool</button>
-          <button class="chip-btn" onclick="sendQuickPrompt('Make an interactive Study Flashcard and Quiz Generator tool')">📚 AI Study Quiz Generator</button>
-          <button class="chip-btn" onclick="sendQuickPrompt('Build an AI Resume and Student Profile Builder tool')">📄 Student Resume Builder</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('విద్యార్థుల కోసం తెలుగు మరియు ఇంగ్లీష్ క్విజ్ తయారు చేసే AI టూల్')">📚 తెలుగు స్టడీ క్విజ్ AI</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('Build an AI C Code Practice Tool with explanations')">💻 C Code Assistant</button>
         </div>
       </div>
     </div>
@@ -525,28 +526,29 @@
 
   <footer>
     <div class="input-row">
-      <button class="btn-main" id="speak-btn" type="button" onclick="startVoiceInput()">🎤 Speak</button>
-      <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool you'd like to invent today..." autocomplete="off">
+      <button class="btn-main" id="speak-en-btn" type="button" onclick="startVoiceInput('en-US')">🎤 English</button>
+      <button class="btn-main btn-telugu-mic" id="speak-te-btn" type="button" onclick="startVoiceInput('te-IN')">🎙️ తెలుగు</button>
+      <input type="text" id="user-input" placeholder="మీకు కావలసిన AI టూల్ గురించి చెప్పండి / Tell Sagar'AI what tool to manufacture..." autocomplete="off">
       <button class="btn-main" id="send-btn" type="button" onclick="executeSend()">Send ➔</button>
     </div>
   </footer>
 
-  <!-- Modal for Live In-Browser Tool Execution -->
+  <!-- Modal for Testing AI Tool Live on Page -->
   <div id="tool-modal">
     <div class="modal-frame">
       <div class="modal-header">
-        <span class="modal-title">⚡ Running Your Manufactured AI Tool</span>
+        <span class="modal-title">⚡ Running Manufactured AI Tool / తయారైన AI టూల్</span>
         <button class="modal-close" onclick="closeToolModal()">✕ Close Tool</button>
       </div>
       <iframe id="app-viewport"></iframe>
     </div>
   </div>
 
-  <!-- Modal for Mobile QR Code Transfer -->
+  <!-- Modal for QR Code Mobile Transfer -->
   <div id="qr-modal">
     <div class="qr-card">
-      <h3 style="color: #34d399; font-size: 1.25rem;">📱 Open on Your Phone</h3>
-      <p style="color: #cbd5e1; font-size: 0.88rem;">Scan this QR code with your mobile camera to launch and enjoy your custom tool on your phone right now:</p>
+      <h3 style="color: #34d399; font-size: 1.25rem;">📱 Open on Mobile / ఫోన్‌లో వాడండి</h3>
+      <p style="color: #cbd5e1; font-size: 0.88rem;">Scan this QR code with your phone camera to launch this tool on your mobile device instantly:</p>
       <div id="qrcode-container"></div>
       <button class="btn-action" style="border-color: #34d399;" onclick="closeQRModal()">Done</button>
     </div>
@@ -591,11 +593,14 @@
       chatBox.appendChild(userBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
 
+      // Telugu character detection for loading text
+      const isTelugu = /[\u0C00-\u0C7F]/.test(text);
+
       const aiBubble = document.createElement("div");
       aiBubble.className = "ai-bubble";
       aiBubble.innerHTML = `
         <div class="ai-tag">⚙ Sagar'AI Factory Manufacturing Tool...</div>
-        <div>Crafting your custom AI tool with care! Assembling your interface... ✨</div>
+        <div>${isTelugu ? 'మీ కోసం ప్రత్యేకమైన AI టూల్ తయారవుతోంది... కాసేపు వేచి ఉండండి! ✨' : 'Crafting your custom AI tool with care! Assembling your interface... ✨'}</div>
       `;
       chatBox.appendChild(aiBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -612,7 +617,7 @@
         const appCode = data.html_app;
 
         aiBubble.innerHTML = `
-          <div class="ai-tag">✨ Sagar'AI Tool Ready</div>
+          <div class="ai-tag">✨ Sagar'AI Tool Ready / సిద్ధమైంది</div>
           <div style="font-size: 1rem; color: #f8fafc;">${rawContent.replace(/\n/g, '<br>')}</div>
         `;
 
@@ -621,11 +626,11 @@
           choicePanel.className = "tool-choice-panel";
 
           choicePanel.innerHTML = `
-            <div class="tool-choice-title">🛠️ What would you like to do with this manufactured tool?</div>
+            <div class="tool-choice-title">🛠️ ${isTelugu ? 'ఈ టూల్‌ను ఎలా ఉపయోగించాలనుకుంటున్నారు?' : 'What would you like to do with this manufactured tool?'}</div>
             <div class="actions-bar">
-              <button class="btn-action btn-run" id="btn-run-here">⚡ Run Tool Here</button>
-              <button class="btn-action btn-mobile" id="btn-open-mobile">📱 Download to Mobile (QR Code)</button>
-              <button class="btn-action" id="btn-save-file">💾 Download HTML File</button>
+              <button class="btn-action btn-run" id="btn-run-here">⚡ ${isTelugu ? 'ఇక్కడే వాడండి (Run Tool Here)' : 'Run Tool Here'}</button>
+              <button class="btn-action btn-mobile" id="btn-open-mobile">📱 ${isTelugu ? 'మొబైల్‌కి పంపండి (QR Code)' : 'Open on Mobile (QR Code)'}</button>
+              <button class="btn-action" id="btn-save-file">💾 ${isTelugu ? 'HTML డౌన్‌లోడ్ చేయండి' : 'Download HTML File'}</button>
             </div>
           `;
 
@@ -638,9 +643,9 @@
 
       } catch (err) {
         aiBubble.innerHTML = `
-          <div class="ai-tag" style="color: #f87171;">⚠️ Connection Notice</div>
-          <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
-          <i>If the Render backend is waking up, please allow ~15 seconds and try again!</i></div>
+          <div class="ai-tag" style="color: #f87171;">⚠️ Notice</div>
+          <div><b>కనెక్షన్ సమస్య / Connection Issue:</b> ${err.message}<br><br>
+          <i>Please wait 15 seconds and try again!</i></div>
         `;
       } finally {
         inputField.disabled = false;
@@ -697,15 +702,18 @@
       URL.revokeObjectURL(url);
     }
 
+    /* DUAL SPEECH ENGINE (ENGLISH & TELUGU) */
     let recognition = null;
-    function startVoiceInput() {
+    function startVoiceInput(langCode) {
       const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechClass) {
         alert("Your browser does not support Speech Recognition. Please use Google Chrome.");
         return;
       }
 
-      const speakBtn = document.getElementById("speak-btn");
+      const activeBtn = langCode === 'te-IN' ? document.getElementById("speak-te-btn") : document.getElementById("speak-en-btn");
+      const originalText = activeBtn.innerText;
+
       if (recognition) {
         try { recognition.abort(); } catch(e) {}
       }
@@ -713,20 +721,20 @@
       recognition = new SpeechClass();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = "en-US";
+      recognition.lang = langCode;
 
-      speakBtn.innerText = "🎙 Listening...";
+      activeBtn.innerText = langCode === 'te-IN' ? "🎙️ వింటున్నాను..." : "🎙️ Listening...";
 
       recognition.onresult = (e) => {
         document.getElementById("user-input").value = e.results[0][0].transcript;
-        speakBtn.innerText = "🎤 Speak";
+        activeBtn.innerText = originalText;
         executeSend();
       };
 
-      recognition.onerror = () => { speakBtn.innerText = "🎤 Speak"; };
-      recognition.onend = () => { speakBtn.innerText = "🎤 Speak"; };
+      recognition.onerror = () => { activeBtn.innerText = originalText; };
+      recognition.onend = () => { activeBtn.innerText = originalText; };
 
-      try { recognition.start(); } catch (err) { speakBtn.innerText = "🎤 Speak"; }
+      try { recognition.start(); } catch (err) { activeBtn.innerText = originalText; }
     }
 
     let player;
