@@ -497,16 +497,16 @@
       <div>
         Hello students and creators! నమస్కారం! 😊 
         <br><br>
-        Whatever AI tool, study companion, or generator you need, we manufacture it instantly in <b>English</b> or <b>తెలుగు (Telugu)</b>!
+        Whatever AI tool, study companion, <b>AI Video Generator</b>, or <b>Meta-AI Builder (AIs that create other AIs)</b> you need, we manufacture it instantly in <b>English</b> or <b>తెలుగు (Telugu)</b>!
         <br><br>
-        <b>Memory Enabled:</b> Our factory remembers previous versions and tools. You can say <i>"Change the colors"</i>, <i>"Add another feature"</i>, or <i>"Now translate this into Telugu"</i>, and we will update it smoothly.
+        Once ready, tap <b>Run Tool Here</b> to test it immediately or <b>Open on Mobile</b> via QR code.
         <br><br>
-        <i>What would you like to build? Tap an idea or speak in English or Telugu:</i>
+        <i>What would you like to invent? Tap an idea or speak in English or Telugu:</i>
         <div class="quick-chips">
-          <button class="chip-btn" onclick="sendQuickPrompt('గణిత సమీకరణాలను గీసే సులభమైన గ్రాఫ్ ప్లాటర్ టూల్ తయారు చేయండి')">📊 తెలుగు గ్రాఫ్ ప్లాటర్</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('Make an AI Text to Video Generator tool that creates downloadable animated videos')">🎬 AI Text-to-Video Maker</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('Build a Meta AI Bot Maker that creates custom specialized AI tools for users')">🤖 AI Bot-Maker Studio</button>
           <button class="chip-btn" onclick="sendQuickPrompt('Make an AI tool that creates PDFs with real AI images based on my notes')">🎨 AI PDF & Image Creator</button>
-          <button class="chip-btn" onclick="sendQuickPrompt('విద్యార్థుల కోసం తెలుగు మరియు ఇంగ్లీష్ క్విజ్ తయారు చేసే AI టూల్')">📚 తెలుగు స్టడీ క్విజ్ AI</button>
-          <button class="chip-btn" onclick="sendQuickPrompt('Build an AI C Code Practice Tool with explanations')">💻 C Code Assistant</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('గణిత సమీకరణాలను గీసే సులభమైన గ్రాఫ్ ప్లాటర్ టూల్ తయారు చేయండి')">📊 తెలుగు గ్రాఫ్ ప్లాటర్</button>
         </div>
       </div>
     </div>
@@ -545,8 +545,6 @@
 
   <script>
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
-    
-    // Multi-turn conversation memory store
     const conversationHistory = [];
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -565,7 +563,6 @@
     }
 
     async function executeSend() {
-      // If mic is currently running when user clicks send, stop it
       if (isListening) {
         stopVoiceInput();
       }
@@ -612,7 +609,6 @@
         const rawContent = data.text || "Your tool has been manufactured and is ready!";
         const appCode = data.html_app;
 
-        // Save into memory
         conversationHistory.push({ role: "user", content: text });
         conversationHistory.push({ role: "assistant", content: rawContent });
 
@@ -702,7 +698,6 @@
       URL.revokeObjectURL(url);
     }
 
-    /* USER-CONTROLLED START & STOP MICROPHONE ENGINE */
     let recognition = null;
     let isListening = false;
     let currentLang = null;
@@ -754,7 +749,6 @@
       };
 
       recognition.onend = () => {
-        // If stopped externally while isListening is still true, clean up state
         if (isListening) {
           stopVoiceInput();
         }
