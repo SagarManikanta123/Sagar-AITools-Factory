@@ -18,13 +18,13 @@
       width: 100%;
       height: 100vh;
       overflow: hidden;
-      background: transparent;
+      background: #030712;
       color: #f1f5f9;
       display: flex;
       flex-direction: column;
     }
 
-    /* FULLSCREEN YOUTUBE BACKGROUND WRAPPER */
+    /* Fullscreen Background Wrapper */
     .video-background {
       position: fixed;
       top: 0;
@@ -34,7 +34,7 @@
       z-index: -10;
       overflow: hidden;
       pointer-events: none;
-      background: #000;
+      background: #030712;
     }
 
     .video-background iframe {
@@ -42,22 +42,21 @@
       top: 50%;
       left: 50%;
       width: 100vw;
-      height: 56.25vw; /* 16:9 ratio */
+      height: 56.25vw;
       min-height: 100vh;
-      min-width: 177.77vh; /* 16:9 ratio */
+      min-width: 177.77vh;
       transform: translate(-50%, -50%) scale(1.35);
       border: none;
       pointer-events: none;
     }
 
-    /* Cinematic semi-transparent tint overlay so text and UI pop cleanly */
     .video-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(3, 7, 18, 0.78) 100%);
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(3, 7, 18, 0.82) 100%);
       z-index: -5;
       pointer-events: none;
     }
@@ -68,8 +67,8 @@
       flex-direction: column;
       gap: 6px;
       border-bottom: 1px solid rgba(168, 85, 247, 0.35);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       background: rgba(15, 23, 42, 0.75);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
       z-index: 10;
@@ -137,7 +136,7 @@
 
     .user-bubble {
       align-self: flex-end;
-      background: rgba(30, 41, 59, 0.85);
+      background: rgba(30, 41, 59, 0.88);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(56, 189, 248, 0.7);
@@ -146,11 +145,12 @@
       padding: 14px 22px;
       max-width: 75%;
       box-shadow: 0 6px 25px rgba(56, 189, 248, 0.2);
+      white-space: pre-wrap;
     }
 
     .ai-bubble {
       align-self: flex-start;
-      background: rgba(20, 24, 48, 0.88);
+      background: rgba(20, 24, 48, 0.9);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(168, 85, 247, 0.55);
@@ -179,18 +179,56 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
+    .actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-action {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid #c084fc;
+      color: #f5d0fe;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: #7c3aed;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-download {
+      border-color: #38bdf8;
+      color: #bae6fd;
+    }
+
+    .btn-download:hover {
+      background: #0284c7;
+      color: #fff;
+    }
+
     footer {
       padding: 16px 24px;
       display: flex;
       gap: 12px;
       border-top: 1px solid rgba(99, 102, 241, 0.3);
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.82);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       z-index: 10;
     }
 
-    input[type="text"] {
+    #user-input {
       flex: 1;
       background: rgba(15, 23, 42, 0.88);
       border: 1px solid rgba(99, 102, 241, 0.5);
@@ -201,32 +239,33 @@
       font-size: 1rem;
     }
 
-    input[type="text"]:focus {
+    #user-input:focus {
       border-color: #e879f9;
       box-shadow: 0 0 15px rgba(232, 121, 249, 0.35);
     }
 
-    .btn {
+    .btn-main {
       background: linear-gradient(90deg, #6366f1, #a855f7);
       color: #fff;
       border: none;
-      padding: 12px 22px;
+      padding: 12px 24px;
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.2s;
     }
 
-    .btn:active { transform: scale(0.97); }
+    .btn-main:active { transform: scale(0.97); }
+    .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .btn-voice-read {
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid #c084fc;
-      color: #c084fc;
-      margin-top: 10px;
-      padding: 6px 14px;
-      font-size: 0.8rem;
+    pre {
+      background: #090d1a;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid rgba(99, 102, 241, 0.25);
     }
   </style>
 </head>
@@ -258,7 +297,7 @@
       <div>
         Welcome to <b>Sagar'AI factory</b>.
         <br><br>
-        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand.
+        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand. Every tool generated can be exported and downloaded directly.
         <br><br>
         <b>Examples to try:</b>
         <ul style="margin-left: 20px; margin-top: 8px;">
@@ -272,15 +311,15 @@
   </div>
 
   <footer>
-    <button class="btn" onclick="startVoiceInput()">🎤 Speak</button>
-    <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." onkeydown="if(event.key==='Enter') sendPrompt()">
-    <button class="btn" onclick="sendPrompt()">Send ➔</button>
+    <button class="btn-main" type="button" onclick="startVoiceInput()">🎤 Speak</button>
+    <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." autocomplete="off">
+    <button class="btn-main" id="send-btn" type="button" onclick="sendPrompt()">Send ➔</button>
   </footer>
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     /* =========================================================
-       SEAMLESS YOUTUBE 4s -> 60s LOOP CONTROLLER
+       1. YOUTUBE BACKGROUND LOOP CONTROLLER (4s -> 60s)
        ========================================================= */
     let player;
     const START_TIME = 4;
@@ -294,7 +333,6 @@
             event.target.seekTo(START_TIME, true);
             event.target.playVideo();
 
-            // Precise timer to monitor and rewind back to 4 seconds
             setInterval(() => {
               if (player && player.getCurrentTime) {
                 const cur = player.getCurrentTime();
@@ -315,7 +353,6 @@
       });
     }
 
-    // Auto unpause on first interaction if Chrome tries to freeze autoplay
     window.addEventListener('click', () => {
       if (player && player.playVideo) {
         player.mute();
@@ -324,25 +361,45 @@
     }, { once: true });
 
     /* =========================================================
-       CHAT & BACKEND LOGIC
+       2. INPUT HANDLING (Fix for input not taking/sending)
        ========================================================= */
+    const inputField = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-btn");
+    const chatBox = document.getElementById("chat-box");
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
 
+    inputField.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendPrompt();
+      }
+    });
+
     async function sendPrompt() {
-      const input = document.getElementById("user-input");
-      const text = input.value.trim();
+      const text = inputField.value.trim();
       if (!text) return;
-      input.value = "";
 
-      const box = document.getElementById("chat-box");
-      box.innerHTML += `<div class="user-bubble">${text}</div>`;
-      box.scrollTop = box.scrollHeight;
+      // Lock input while processing
+      inputField.value = "";
+      inputField.disabled = true;
+      sendButton.disabled = true;
 
-      const aiMsg = document.createElement("div");
-      aiMsg.className = "ai-bubble";
-      aiMsg.innerHTML = `<div class="ai-tag">✨ Sagar'AI Manufacturing Tool...</div><div>Synthesizing architecture, instructions & code...</div>`;
-      box.appendChild(aiMsg);
-      box.scrollTop = box.scrollHeight;
+      // User Message Bubble
+      const userBubble = document.createElement("div");
+      userBubble.className = "user-bubble";
+      userBubble.textContent = text;
+      chatBox.appendChild(userBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // AI Loading State
+      const aiBubble = document.createElement("div");
+      aiBubble.className = "ai-bubble";
+      aiBubble.innerHTML = `
+        <div class="ai-tag">⚙️ Sagar'AI Manufacturing Core Active...</div>
+        <div>Architecting tool system logic, instructions & downloadable payload...</div>
+      `;
+      chatBox.appendChild(aiBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
         const response = await fetch(API_ENDPOINT, {
@@ -350,21 +407,52 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text })
         });
-        const data = await response.json();
 
-        aiMsg.innerHTML = `<div class="ai-tag">✨ Sagar'AI Output</div><div>${data.text}</div>`;
+        if (!response.ok) {
+          throw new Error(`Server returned HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const rawContent = data.text || "No output returned.";
+
+        // Format Markdown code blocks cleanly
+        let formatted = rawContent
+          .replace(/```python([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>')
+          .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+          .replace(/\n/g, '<br>');
+
+        aiBubble.innerHTML = `
+          <div class="ai-tag">✨ Sagar'AI Manufactured Tool</div>
+          <div>${formatted}</div>
+        `;
 
         if (data.plot_image) {
-          aiMsg.innerHTML += `<div><img class="rendered-plot" src="data:image/png;base64,${data.plot_image}" alt="Rendered Plot" /></div>`;
+          aiBubble.innerHTML += `<div><img class="rendered-plot" src="data:image/png;base64,${data.plot_image}" alt="Rendered Plot" /></div>`;
         }
 
         if (data.qr_image) {
-          aiMsg.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
+          aiBubble.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
         }
 
-        aiMsg.innerHTML += `<button class="btn btn-voice-read" onclick="speakText(this.parentElement.innerText)">🔊 Read Aloud</button>`;
+        // Action Toolbar: Download AI Tool + Read Aloud
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "actions-bar";
 
-        renderMathInElement(aiMsg, {
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "btn-action btn-download";
+        downloadBtn.innerHTML = "📥 Download AI Tool (.py)";
+        downloadBtn.onclick = () => downloadAITool(rawContent, text);
+
+        const readBtn = document.createElement("button");
+        readBtn.className = "btn-action";
+        readBtn.innerHTML = "🔊 Read Aloud";
+        readBtn.onclick = () => speakText(rawContent);
+
+        actionsDiv.appendChild(downloadBtn);
+        actionsDiv.appendChild(readBtn);
+        aiBubble.appendChild(actionsDiv);
+
+        renderMathInElement(aiBubble, {
           delimiters: [
             { left: "$$", right: "$$", display: true },
             { left: "$", right: "$", display: false }
@@ -372,9 +460,54 @@
         });
 
       } catch (err) {
-        aiMsg.innerHTML = `<div class="ai-tag">⚠️ Notice</div><div>Server waking up or processing. Free instances take roughly 40 seconds on the first call. (${err.message})</div>`;
+        aiBubble.innerHTML = `
+          <div class="ai-tag" style="color: #f87171;">⚠️ Engine Notice</div>
+          <div>The backend is connecting or spinning up. If it is sleeping, please allow up to 40 seconds and try once more.<br><small style="color:#94a3b8">Details: ${err.message}</small></div>
+        `;
+      } finally {
+        inputField.disabled = false;
+        sendButton.disabled = false;
+        inputField.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
-      box.scrollTop = box.scrollHeight;
+    }
+
+    /* =========================================================
+       3. DOWNLOAD AI TOOL EXPORTER
+       ========================================================= */
+    function downloadAITool(fullContent, promptTopic) {
+      // Extract python code block if present; otherwise export full specification
+      const codeMatch = fullContent.match(/```python([\s\S]*?)```/);
+      let fileData = "";
+      let filename = "manufactured_ai_tool.py";
+
+      if (codeMatch && codeMatch[1]) {
+        fileData = `# ==========================================================\n` +
+                   `# MANUFACTURED BY: Sagar'AI factory\n` +
+                   `# Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
+                   `# Co-Founder: J.Y.N.V.Subhash\n` +
+                   `# Prompt: ${promptTopic}\n` +
+                   `# ==========================================================\n\n` +
+                   codeMatch[1].trim() + "\n";
+      } else {
+        filename = "manufactured_ai_tool.md";
+        fileData = `# ==========================================================\n` +
+                   `# MANUFACTURED BY: Sagar'AI factory\n` +
+                   `# Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
+                   `# Co-Founder: J.Y.N.V.Subhash\n` +
+                   `# ==========================================================\n\n` +
+                   fullContent;
+      }
+
+      const blob = new Blob([fileData], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function speakText(content) {
@@ -390,7 +523,7 @@
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recog = new SR();
         recog.onresult = (e) => {
-          document.getElementById("user-input").value = e.results[0][0].transcript;
+          inputField.value = e.results[0][0].transcript;
           sendPrompt();
         };
         recog.start();
