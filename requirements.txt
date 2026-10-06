@@ -1,8 +1,7 @@
 fastapi
 uvicorn
-requests
+groq
 pydantic
 numpy
 matplotlib
-sympy
 qrcode[pil]
