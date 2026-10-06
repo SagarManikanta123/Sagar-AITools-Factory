@@ -145,20 +145,20 @@
 
     .ai-bubble {
       align-self: flex-start;
-      background: rgba(20, 24, 48, 0.92);
+      background: rgba(20, 24, 48, 0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(168, 85, 247, 0.55);
       border-left: 4px solid #e879f9;
       border-radius: 4px 20px 20px 20px;
-      padding: 18px 26px;
-      max-width: 82%;
+      padding: 20px 26px;
+      max-width: 84%;
       line-height: 1.65;
       box-shadow: 0 10px 35px rgba(168, 85, 247, 0.22);
     }
 
     .ai-tag {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 800;
       color: #e879f9;
       text-transform: uppercase;
@@ -166,49 +166,68 @@
       margin-bottom: 8px;
     }
 
-    .rendered-plot {
-      margin-top: 14px;
-      border-radius: 10px;
-      max-width: 100%;
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    .tool-choice-panel {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tool-choice-title {
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 0.95rem;
     }
 
     .actions-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 14px;
     }
 
     .btn-action {
-      background: rgba(30, 41, 59, 0.9);
+      background: rgba(30, 41, 59, 0.95);
       border: 1px solid #c084fc;
       color: #f5d0fe;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s ease;
     }
 
     .btn-action:hover {
       background: #7c3aed;
       color: #fff;
+      transform: translateY(-1px);
     }
 
-    .btn-download {
-      border-color: #38bdf8;
-      color: #bae6fd;
-    }
-
-    .btn-download:hover {
-      background: #0284c7;
+    .btn-run {
+      background: linear-gradient(90deg, #0284c7, #2563eb);
+      border: 1px solid #38bdf8;
       color: #fff;
+    }
+
+    .btn-run:hover {
+      background: linear-gradient(90deg, #0369a1, #1d4ed8);
+    }
+
+    .btn-mobile {
+      background: linear-gradient(90deg, #059669, #10b981);
+      border: 1px solid #34d399;
+      color: #fff;
+    }
+
+    .btn-mobile:hover {
+      background: linear-gradient(90deg, #047857, #059669);
     }
 
     footer {
@@ -258,13 +277,103 @@
     .btn-main:active { transform: scale(0.97); }
     .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    pre {
-      background: #090d1a;
-      padding: 12px;
+    /* Modal for Tool Execution */
+    #tool-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-frame {
+      width: 95%;
+      max-width: 900px;
+      height: 85vh;
+      background: #0f172a;
+      border: 2px solid #38bdf8;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      padding: 14px 20px;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .modal-title {
+      font-weight: 800;
+      color: #38bdf8;
+      font-size: 1.1rem;
+    }
+
+    .modal-close {
+      background: #ef4444;
+      border: none;
+      color: #fff;
+      padding: 6px 14px;
       border-radius: 8px;
-      overflow-x: auto;
-      margin: 10px 0;
-      border: 1px solid rgba(99, 102, 241, 0.25);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #app-viewport {
+      flex: 1;
+      border: none;
+      background: #fff;
+    }
+
+    /* Modal for QR Code */
+    #qr-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .qr-card {
+      background: #0f172a;
+      border: 2px solid #34d399;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 380px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    #qrcode-container {
+      background: #fff;
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   </style>
 </head>
@@ -295,15 +404,7 @@
       <div>
         Welcome to <b>Sagar'AI factory</b>.
         <br><br>
-        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand. Every tool generated can be exported and downloaded directly as an executable Python script.
-        <br><br>
-        <b>Examples to try:</b>
-        <ul style="margin-left: 20px; margin-top: 8px;">
-          <li><i>"Build an AI Resume Screener tool"</i></li>
-          <li><i>"Make an AI tool to write C code"</i></li>
-          <li><i>"Make an AI tool that creates PDFs based on user input"</i></li>
-          <li><i>"Plot a 3D surface mesh plot"</i></li>
-        </ul>
+        Ask us to manufacture any tool (e.g., an AI PDF Maker with AI Images, an AI Code Writer, or an AI Resume Screener). We assemble the software instantly and let you <b>use it right here on screen</b> or <b>download it straight into your mobile phone</b>.
       </div>
     </div>
   </div>
@@ -311,14 +412,33 @@
   <footer>
     <div class="input-row">
       <button class="btn-main" id="speak-btn" type="button" onclick="startVoiceInput()">🎤 Speak</button>
-      <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." autocomplete="off">
+      <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture..." autocomplete="off">
       <button class="btn-main" id="send-btn" type="button" onclick="executeSend()">Send ➔</button>
     </div>
   </footer>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <!-- Modal for Testing AI Tool Live on Page -->
+  <div id="tool-modal">
+    <div class="modal-frame">
+      <div class="modal-header">
+        <span class="modal-title">⚡ Running Manufactured AI Tool</span>
+        <button class="modal-close" onclick="closeToolModal()">✕ Close Tool</button>
+      </div>
+      <iframe id="app-viewport"></iframe>
+    </div>
+  </div>
+
+  <!-- Modal for QR Code Mobile Transfer -->
+  <div id="qr-modal">
+    <div class="qr-card">
+      <h3 style="color: #34d399; font-size: 1.2rem;">📱 Download & Open on Mobile</h3>
+      <p style="color: #cbd5e1; font-size: 0.88rem;">Scan this QR code with your phone camera to launch this AI tool on your mobile device instantly:</p>
+      <div id="qrcode-container"></div>
+      <button class="btn-action" style="border-color: #34d399;" onclick="closeQRModal()">Done</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
@@ -355,8 +475,8 @@
       const aiBubble = document.createElement("div");
       aiBubble.className = "ai-bubble";
       aiBubble.innerHTML = `
-        <div class="ai-tag">⚙ Sagar'AI Manufacturing Core Active...</div>
-        <div>Manufacturing standalone AI tool script and interactive runner...</div>
+        <div class="ai-tag">⚙ Sagar'AI Factory Manufacturing Tool...</div>
+        <div>Assembling your custom AI tool interface and intelligence engine...</div>
       `;
       chatBox.appendChild(aiBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -369,61 +489,40 @@
         });
 
         const data = await response.json();
-        const rawContent = data.text || "Tool manufactured successfully.";
-
-        let formatted = rawContent
-          .replace(/```python([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>')
-          .replace(/```c([\s\S]*?)```/g, '<pre><code class="language-c">$1</code></pre>')
-          .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-          .replace(/\n/g, '<br>');
+        const rawContent = data.text || "Your tool has been manufactured and is ready.";
+        const appCode = data.html_app;
 
         aiBubble.innerHTML = `
-          <div class="ai-tag">✨ Sagar'AI Manufactured Tool</div>
-          <div>${formatted}</div>
+          <div class="ai-tag">✨ Sagar'AI Tool Ready</div>
+          <div style="font-size: 1rem; color: #f1f5f9;">${rawContent.replace(/\n/g, '<br>')}</div>
         `;
 
-        if (data.plot_image) {
-          aiBubble.innerHTML += `<div><img class="rendered-plot" src="data:image/png;base64,${data.plot_image}" alt="Rendered Plot" /></div>`;
-        }
+        // If an executable AI application was manufactured, offer the choice: Use here or Mobile
+        if (appCode) {
+          const choicePanel = document.createElement("div");
+          choicePanel.className = "tool-choice-panel";
 
-        if (data.qr_image) {
-          aiBubble.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
-        }
+          choicePanel.innerHTML = `
+            <div class="tool-choice-title">🛠️ What would you like to do with this manufactured tool?</div>
+            <div class="actions-bar">
+              <button class="btn-action btn-run" id="btn-run-here">⚡ Run Tool Here</button>
+              <button class="btn-action btn-mobile" id="btn-open-mobile">📱 Download to Mobile (QR Code)</button>
+              <button class="btn-action" id="btn-save-file">💾 Download HTML File</button>
+            </div>
+          `;
 
-        const actionsDiv = document.createElement("div");
-        actionsDiv.className = "actions-bar";
+          aiBubble.appendChild(choicePanel);
 
-        const downloadBtn = document.createElement("button");
-        downloadBtn.className = "btn-action btn-download";
-        downloadBtn.innerHTML = "📥 Download AI Tool (.py)";
-        downloadBtn.onclick = () => downloadAITool(rawContent, text);
-
-        const readBtn = document.createElement("button");
-        readBtn.className = "btn-action";
-        readBtn.innerHTML = "🔊 Read Aloud";
-        readBtn.onclick = () => speakText(rawContent);
-
-        actionsDiv.appendChild(downloadBtn);
-        actionsDiv.appendChild(readBtn);
-        aiBubble.appendChild(actionsDiv);
-
-        if (window.renderMathInElement) {
-          try {
-            renderMathInElement(aiBubble, {
-              delimiters: [
-                { left: "$$", right: "$$", display: true },
-                { left: "$", right: "$", display: false }
-              ],
-              throwOnError: false
-            });
-          } catch(e) {}
+          choicePanel.querySelector("#btn-run-here").onclick = () => runToolHere(appCode);
+          choicePanel.querySelector("#btn-open-mobile").onclick = () => transferToMobile(appCode);
+          choicePanel.querySelector("#btn-save-file").onclick = () => downloadToolFile(appCode, text);
         }
 
       } catch (err) {
         aiBubble.innerHTML = `
           <div class="ai-tag" style="color: #f87171;">⚠️ Connection Notice</div>
           <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
-          <i>If the Render backend is waking up, please wait 15 seconds and try again.</i></div>
+          <i>Please wait 15 seconds and try again.</i></div>
         `;
       } finally {
         inputField.disabled = false;
@@ -433,37 +532,58 @@
       }
     }
 
-    function downloadAITool(fullContent, promptTopic) {
-      const pyMatches = fullContent.match(/```python([\s\S]*?)```/);
-      let filename = "manufactured_ai_tool.py";
-      let fileData = "";
+    /* 1. RUN TOOL DIRECTLY INSIDE BROWSER */
+    function runToolHere(htmlContent) {
+      const modal = document.getElementById("tool-modal");
+      const iframe = document.getElementById("app-viewport");
+      modal.style.display = "flex";
+      iframe.srcdoc = htmlContent;
+    }
 
-      if (pyMatches && pyMatches[1]) {
-        fileData = `"""\n` +
-                   `===============================================================\n` +
-                   `MANUFACTURED BY: Sagar'AI factory\n` +
-                   `Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
-                   `Co-Founder: J.Y.N.V.Subhash\n` +
-                   `Tool Request: ${promptTopic}\n` +
-                   `===============================================================\n` +
-                   `"""\n\n` +
-                   pyMatches[1].trim() + "\n";
-      } else {
-        filename = "manufactured_tool_instructions.md";
-        fileData = fullContent;
-      }
+    function closeToolModal() {
+      document.getElementById("tool-modal").style.display = "none";
+      document.getElementById("app-viewport").srcdoc = "";
+    }
 
-      const blob = new Blob([fileData], { type: "text/x-python;charset=utf-8" });
+    /* 2. DOWNLOAD / TRANSFER TO MOBILE VIA QR CODE */
+    function transferToMobile(htmlContent) {
+      const modal = document.getElementById("qr-modal");
+      const container = document.getElementById("qrcode-container");
+      container.innerHTML = "";
+
+      // Encode HTML into a data URL for mobile browsers
+      const dataUri = "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent);
+
+      new QRCode(container, {
+        text: dataUri.length < 2000 ? dataUri : window.location.href,
+        width: 220,
+        height: 220,
+        colorDark: "#030712",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      modal.style.display = "flex";
+    }
+
+    function closeQRModal() {
+      document.getElementById("qr-modal").style.display = "none";
+    }
+
+    /* 3. DOWNLOAD TOOL FILE */
+    function downloadToolFile(htmlContent, promptTopic) {
+      const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
+      a.download = "manufactured_ai_tool.html";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
+    /* SPEECH RECOGNITION */
     let recognition = null;
     function startVoiceInput() {
       const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -473,7 +593,6 @@
       }
 
       const speakBtn = document.getElementById("speak-btn");
-
       if (recognition) {
         try { recognition.abort(); } catch(e) {}
       }
@@ -486,38 +605,18 @@
       speakBtn.innerText = "🎙 Listening...";
 
       recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        document.getElementById("user-input").value = transcript;
+        document.getElementById("user-input").value = e.results[0][0].transcript;
         speakBtn.innerText = "🎤 Speak";
         executeSend();
       };
 
-      recognition.onerror = (e) => {
-        speakBtn.innerText = "🎤 Speak";
-        if (e.error !== 'aborted' && e.error !== 'no-speech') {
-          console.warn("Speech warning:", e.error);
-        }
-      };
+      recognition.onerror = () => { speakBtn.innerText = "🎤 Speak"; };
+      recognition.onend = () => { speakBtn.innerText = "🎤 Speak"; };
 
-      recognition.onend = () => {
-        speakBtn.innerText = "🎤 Speak";
-      };
-
-      try {
-        recognition.start();
-      } catch (err) {
-        speakBtn.innerText = "🎤 Speak";
-      }
+      try { recognition.start(); } catch (err) { speakBtn.innerText = "🎤 Speak"; }
     }
 
-    function speakText(content) {
-      window.speechSynthesis.cancel();
-      const clean = content.replace(/\$/g, '').replace(/[*_#`]/g, '');
-      const utter = new SpeechSynthesisUtterance(clean);
-      utter.rate = 1.0;
-      window.speechSynthesis.speak(utter);
-    }
-
+    /* YOUTUBE BACKGROUND LOOP */
     let player;
     function onYouTubeIframeAPIReady() {
       try {
