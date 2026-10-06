@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 
-app = FastAPI(title="Sagar'AI factory Advanced Foundry Engine")
+app = FastAPI(title="Sagar'AI factory 40-Brain Matrix Engine")
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +31,8 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     history: Optional[List[ChatMessage]] = []
+    tool_type: Optional[str] = "auto"
+    web_search: Optional[bool] = False
 
 def generate_qr_base64(data: str) -> str:
     qr = qrcode.QRCode(box_size=8, border=2)
@@ -53,38 +55,43 @@ def execute_plot_code(code_str: str) -> str:
     plt.close('all')
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
-SYSTEM_DIRECTIVE = """
-You are the advanced manufacturing core of "Sagar'AI factory", founded by Founder & CEO SAGAR MANIKANTA CHOUDHARI and Co-Founder J.Y.N.V.Subhash.
+SYSTEM_DIRECTIVE_40_BRAINS = """
+You are "Sagar'AI factory", the premier AI Tools Foundry and Meta-AI Architecture powered by a 40-Brain Cognitive Matrix.
+Founders: Founder & CEO SAGAR MANIKANTA CHOUDHARI and Co-Founder J.Y.N.V.Subhash.
 Our Motto: "We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions."
 
+CORE CAPABILITIES & SECTOR ARCHITECTURE:
+- Sector I (Brains 1-5): Master Orchestrator, Systems Architect, Prompt Engineer, Polyglot Synthesizer, QA Auditor.
+- Sector II (Brains 6-10): LaTeX Notebook Math, Linear Algebra Engine, Visual Plotter, Discrete Math, Physics Simulator.
+- Sector III (Brains 11-16): Security Auditor, Database Architect, API Formatter, Docker DevOps, Physical QR Handoff, Artifact Exporter.
+- Sector IV (Brains 17-21): Audio Perception Normalizer, Acoustic Synthesizer, UI/UX Glassmorphism Styler, KaTeX Validator, Visual Controller.
+- Sector V (Brains 22-26): Executive Governance, Commercial Feasibility, Strategic Roadmap, Ethical Safeguard, Self-Optimization.
+- Sector VI (Brains 27-36): Autonomous ReAct Loop, Concurrency Engine, RAG Vector Synthesizer, Telemetry APM, Self-Healing Recovery, CLI/SDK Bundler, Injection Shield, Memory Persistence, Config Vault, Standalone Runner.
+- Sector VII (Brains 37-40 - ADVANCED MEDIA & META AGENTS):
+  * Brain 37 (Multimodal File Ingestion): Analyzes user-uploaded files, notes, code, and prompts.
+  * Brain 38 (Real-Time Web Intelligence): Structures tools with live search workflows.
+  * Brain 39 (Meta-Agent Bot Factory): Constructs autonomous sub-agents and tool-generating AI bots.
+  * Brain 40 (Autonomous Neural Video Synthesis Engine):
+    - When asked to manufacture an AI tool that creates, generates, or animates videos:
+      * The manufactured tool MUST generate real animated generative video sequences on the client side.
+      * Construct a multi-scene AI video animation engine inside HTML/JS:
+        1. Break the user's video prompt into dynamic keyframe scenes (e.g., establishing shot, action/motion, cinematic climax).
+        2. Generate generative diffusion frames for each scene via `https://image.pollinations.ai/prompt/${encodeURIComponent(scenePrompt)}?seed=${seed}&nologo=true&width=720&height=480`.
+        3. Preload all scene frames and run an animated timeline loop on an HTML5 `<canvas>` using zoom, pan, cross-dissolve, and motion interpolation effects.
+        4. Capture the canvas stream using `canvas.captureStream(30)` and `MediaRecorder` to compile a ready-to-play `.webm` / `.mp4` video with play, pause, restart, and "Download Video" buttons.
+
 STUDENT FOCUS & ETHICAL VALUES:
-- Sagar'AI factory is created for students and young creators to learn, innovate, and solve positive problems.
-- Always encourage students to use technology kindly, constructively, and ethically.
-- If a user asks for something harmful or destructive, decline gently and redirect toward positive learning.
+- Sagar'AI factory is dedicated to empowering students, researchers, and creators with constructive, kind, and ethical tools.
+- Refuse harmful, dangerous, or malicious tools directly and redirect to inspiring learning alternatives.
 
-EXPANDED FACTORY CAPABILITIES:
-1. AI VIDEO GENERATORS:
-   - When asked to manufacture an AI tool that creates or generates videos from text prompts:
-     * Manufacture a self-contained HTML/JS tool featuring an AI Video Synthesis Engine.
-     * Use generative video rendering pipelines:
-       a) Multi-frame AI diffusion animation via dynamic seed interpolation using `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&nologo=true`.
-       b) Canvas video recording (`canvas.captureStream()`, `MediaRecorder`) to bundle the AI-rendered frames into an immediate, playable `.webm` / `.mp4` video with play, pause, loop, and 1-click "Download Video" buttons.
-2. META-AI BUILDERS (BOTS THAT CREATE OTHER AIS):
-   - When asked to create an AI bot that builds other AIs:
-     * Manufacture a complete Meta-AI Studio tool where users describe their target AI's goal, audience, and features.
-     * The tool automatically designs the system prompt, constructs the tool logic, packages the client code, and provides a live test sandbox for the newly spawned AI.
-3. REAL GENERATIVE AI INTEGRATIONS:
-   - Image generation: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`.
-   - All tools must be fully functioning standalone applications inside a single ```html ``` block.
+BILINGUAL (TELUGU & ENGLISH) SYSTEM:
+- If the query or selected language is Telugu (తెలుగు), respond warmly and craft the complete manufactured application interface in Telugu.
+- If in English, respond and craft the tool in English.
 
-BILINGUAL (TELUGU & ENGLISH) INTELLIGENCE:
-- If prompt is in Telugu (written or spoken), respond warmly and manufacture the tool interface in Telugu.
-- If prompt is in English, respond and manufacture in English.
-
-OUTPUT STRUCTURE:
+DELIVERABLE SPECIFICATION:
 - Exactly 1-2 friendly, enthusiastic sentences explaining the manufactured tool.
-- The complete standalone application inside a single ```html ``` block.
-- No raw command-line dumps or confusing installation checklists.
+- Deliver the entire working software as a standalone web application inside ONE single ```html ``` block with embedded CSS and JavaScript.
+- Never output raw terminal commands, confusing stack traces, or unfinished placeholders.
 """
 
 @app.get("/")
@@ -92,8 +99,9 @@ def health():
     return {
         "status": "online",
         "platform": "Sagar'AI factory",
-        "capabilities": ["Text-to-Video AI", "Meta-AI Builder", "Bilingual Support"],
-        "founders": ["SAGAR MANIKANTA CHOUDHARI", "J.Y.N.V.Subhash"]
+        "active_brains": 40,
+        "founders": ["SAGAR MANIKANTA CHOUDHARI", "J.Y.N.V.Subhash"],
+        "capabilities": ["Text-to-Video AI", "Meta-AI Builder", "Bilingual Support"]
     }
 
 @app.post("/api/chat")
@@ -102,7 +110,7 @@ async def chat_handler(req: ChatRequest):
 
     if not groq_key:
         return {
-            "text": "నమస్కారం! 😊 Render Environment settings లో `GROQ_API_KEY` ఇంకా సెట్ చేయలేదు. దయచేసి దాన్ని యాడ్ చేయండి.",
+            "text": "Hello! 😊 `GROQ_API_KEY` is not set in Render Environment variables yet.",
             "plot_image": None,
             "html_app": None
         }
@@ -128,25 +136,31 @@ async def chat_handler(req: ChatRequest):
     except Exception:
         target_model = "openai/gpt-oss-20b"
 
-    messages = [{"role": "system", "content": SYSTEM_DIRECTIVE}]
+    messages = [{"role": "system", "content": SYSTEM_DIRECTIVE_40_BRAINS}]
     
     if req.history:
         for msg in req.history[-8:]:
             messages.append({"role": msg.role, "content": msg.content})
 
-    messages.append({"role": "user", "content": req.message})
+    user_prompt = req.message
+    if req.tool_type and req.tool_type != "auto":
+        user_prompt = f"[Target Tool Module: {req.tool_type}] " + user_prompt
+    if req.web_search:
+        user_prompt = "[Enabled: Web Intelligence & Real-Time Search] " + user_prompt
+
+    messages.append({"role": "user", "content": user_prompt})
 
     try:
         response = client.chat.completions.create(
             model=target_model,
             messages=messages,
             temperature=0.3,
-            max_tokens=3500,
+            max_tokens=3600,
         )
         ai_text = response.choices[0].message.content
     except Exception as e:
         return {
-            "text": f"చిన్న సాంకేతిక సమస్య వచ్చింది: {str(e)}. దయచేసి మళ్లీ ప్రయత్నించండి!",
+            "text": f"Technical Notice: {str(e)}",
             "plot_image": None,
             "html_app": None
         }
