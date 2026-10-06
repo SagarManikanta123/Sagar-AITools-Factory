@@ -27,7 +27,6 @@ class QueryPayload(BaseModel):
 def convert_to_notebook_math(text: str) -> str:
     if not text:
         return ""
-    # Convert square brackets used as block equations into $$...$$
     converted = re.sub(r"(?<!\\)\[\s*([\s\S]*?)\s*\]", r"$$\1$$", text)
     converted = re.sub(r"\\\(\s*([\s\S]*?)\s*\\\)", r"$\1$", converted)
     converted = re.sub(r"\\\[\s*([\s\S]*?)\s*\\\]", r"$$\1$$", converted)
@@ -53,11 +52,15 @@ def execute_plot_code(code_snippet: str):
     except Exception:
         return None
 
+@app.get("/")
+def health_check():
+    return {"status": "online", "platform": "Sagar'AI factory"}
+
 @app.post("/api/chat")
 async def chat_handler(payload: QueryPayload):
     user_query = payload.message
     if not GROQ_API_KEY:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is not set.")
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is missing on server.")
 
     system_directive = (
         "You are Sagar'AI factory, founded by Founder & CEO SAGAR MANIKANTA CHOUDHARI "
@@ -91,13 +94,11 @@ async def chat_handler(payload: QueryPayload):
 
     raw_response = res.json()["choices"][0]["message"]["content"]
 
-    # 1. Execute and extract Plot Image
     plot_b64 = None
     code_match = re.search(r"```(?:python)?\s*(.*?)\s*```", raw_response, re.DOTALL)
     if code_match:
         plot_b64 = execute_plot_code(code_match.group(1))
 
-    # 2. Extract and generate QR Code
     qr_b64 = None
     qr_match = re.search(r"GENERATE_QR:\s*(.+)", raw_response, re.IGNORECASE)
     if qr_match:
@@ -108,7 +109,6 @@ async def chat_handler(payload: QueryPayload):
         qr.make_image(fill_color="black", back_color="white").save(img_buf, format="PNG")
         qr_b64 = base64.b64encode(img_buf.getvalue()).decode("utf-8")
 
-    # 3. Clean up display text and convert math
     cleaned = re.sub(r"GENERATE_QR:\s*.+", "", raw_response, flags=re.IGNORECASE)
     cleaned = re.sub(r"```(?:python)?\s*.*?```", "", cleaned, flags=re.DOTALL).strip()
     cleaned = convert_to_notebook_math(cleaned)
