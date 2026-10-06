@@ -341,15 +341,27 @@
       cursor: pointer;
       white-space: nowrap;
       flex-shrink: 0;
+      transition: all 0.2s ease;
     }
 
     .btn-telugu-mic {
       background: linear-gradient(135deg, #f59e0b, #ea580c);
     }
 
+    .btn-mic-active {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.6) !important;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
     .btn-main:active { transform: scale(0.95); }
 
-    /* Modals with Adaptive Height & Safe Dimensions */
     #tool-modal, #qr-modal {
       display: none;
       position: fixed;
@@ -487,7 +499,7 @@
         <br><br>
         Whatever AI tool, study companion, or generator you need, we manufacture it instantly in <b>English</b> or <b>తెలుగు (Telugu)</b>!
         <br><br>
-        Once ready, you can <b>run it directly on your screen</b> or <b>open it on mobile via QR code</b>.
+        <b>Memory Enabled:</b> Our factory remembers previous versions and tools. You can say <i>"Change the colors"</i>, <i>"Add another feature"</i>, or <i>"Now translate this into Telugu"</i>, and we will update it smoothly.
         <br><br>
         <i>What would you like to build? Tap an idea or speak in English or Telugu:</i>
         <div class="quick-chips">
@@ -502,8 +514,8 @@
 
   <footer>
     <div class="input-row">
-      <button class="btn-main" id="speak-en-btn" type="button" onclick="startVoiceInput('en-US')">🎤 En</button>
-      <button class="btn-main btn-telugu-mic" id="speak-te-btn" type="button" onclick="startVoiceInput('te-IN')">🎙️ తెలుగు</button>
+      <button class="btn-main" id="speak-en-btn" type="button" onclick="toggleVoiceInput('en-US')">🎤 En</button>
+      <button class="btn-main btn-telugu-mic" id="speak-te-btn" type="button" onclick="toggleVoiceInput('te-IN')">🎙️ తెలుగు</button>
       <input type="text" id="user-input" placeholder="Type or speak tool request..." autocomplete="off">
       <button class="btn-main" id="send-btn" type="button" onclick="executeSend()">Send ➔</button>
     </div>
@@ -533,6 +545,9 @@
 
   <script>
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
+    
+    // Multi-turn conversation memory store
+    const conversationHistory = [];
 
     document.addEventListener("DOMContentLoaded", () => {
       const input = document.getElementById("user-input");
@@ -550,6 +565,11 @@
     }
 
     async function executeSend() {
+      // If mic is currently running when user clicks send, stop it
+      if (isListening) {
+        stopVoiceInput();
+      }
+
       const inputField = document.getElementById("user-input");
       const sendButton = document.getElementById("send-btn");
       const chatBox = document.getElementById("chat-box");
@@ -582,12 +602,19 @@
         const response = await fetch(API_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
+          body: JSON.stringify({ 
+            message: text,
+            history: conversationHistory
+          })
         });
 
         const data = await response.json();
         const rawContent = data.text || "Your tool has been manufactured and is ready!";
         const appCode = data.html_app;
+
+        // Save into memory
+        conversationHistory.push({ role: "user", content: text });
+        conversationHistory.push({ role: "assistant", content: rawContent });
 
         aiBubble.innerHTML = `
           <div class="ai-tag">✨ Sagar'AI Tool Ready / సిద్ధమైంది</div>
@@ -675,7 +702,22 @@
       URL.revokeObjectURL(url);
     }
 
+    /* USER-CONTROLLED START & STOP MICROPHONE ENGINE */
     let recognition = null;
+    let isListening = false;
+    let currentLang = null;
+
+    function toggleVoiceInput(langCode) {
+      if (isListening && currentLang === langCode) {
+        stopVoiceInput();
+      } else {
+        if (isListening) {
+          stopVoiceInput();
+        }
+        startVoiceInput(langCode);
+      }
+    }
+
     function startVoiceInput(langCode) {
       const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechClass) {
@@ -683,30 +725,65 @@
         return;
       }
 
-      const activeBtn = langCode === 'te-IN' ? document.getElementById("speak-te-btn") : document.getElementById("speak-en-btn");
-      const originalText = activeBtn.innerText;
+      currentLang = langCode;
+      isListening = true;
 
-      if (recognition) {
-        try { recognition.abort(); } catch(e) {}
-      }
+      const activeBtn = langCode === 'te-IN' ? document.getElementById("speak-te-btn") : document.getElementById("speak-en-btn");
+      activeBtn.classList.add("btn-mic-active");
+      activeBtn.innerText = "⏹️ Stop";
 
       recognition = new SpeechClass();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true;
+      recognition.interimResults = true;
       recognition.lang = langCode;
 
-      activeBtn.innerText = langCode === 'te-IN' ? "🎙️ ..." : "🎙️ ...";
+      const inputField = document.getElementById("user-input");
 
       recognition.onresult = (e) => {
-        document.getElementById("user-input").value = e.results[0][0].transcript;
-        activeBtn.innerText = originalText;
-        executeSend();
+        let transcript = "";
+        for (let i = 0; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript;
+        }
+        inputField.value = transcript;
       };
 
-      recognition.onerror = () => { activeBtn.innerText = originalText; };
-      recognition.onend = () => { activeBtn.innerText = originalText; };
+      recognition.onerror = (e) => {
+        if (e.error !== 'aborted') {
+          console.warn("Speech error:", e.error);
+        }
+      };
 
-      try { recognition.start(); } catch (err) { activeBtn.innerText = originalText; }
+      recognition.onend = () => {
+        // If stopped externally while isListening is still true, clean up state
+        if (isListening) {
+          stopVoiceInput();
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        stopVoiceInput();
+      }
+    }
+
+    function stopVoiceInput() {
+      isListening = false;
+      if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+        recognition = null;
+      }
+
+      const enBtn = document.getElementById("speak-en-btn");
+      const teBtn = document.getElementById("speak-te-btn");
+
+      enBtn.classList.remove("btn-mic-active");
+      enBtn.innerText = "🎤 En";
+
+      teBtn.classList.remove("btn-mic-active");
+      teBtn.innerText = "🎙️ తెలుగు";
+
+      currentLang = null;
     }
 
     let player;
