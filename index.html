@@ -231,7 +231,7 @@
 </head>
 <body>
 
-  <!-- Dynamic YouTube Background -->
+  <!-- Background Video Element -->
   <div class="video-background">
     <div id="ytplayer"></div>
   </div>
@@ -277,9 +277,9 @@
   <script>
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
 
-    // YouTube Loop Controller (7s to 60s)
+    // Loop interval configuration: 4 seconds to 60 seconds (1 minute)
     let player;
-    const START_TIME = 7;
+    const START_TIME = 4;
     const END_TIME = 60;
 
     function onYouTubeIframeAPIReady() {
@@ -302,7 +302,7 @@
             event.target.mute();
             event.target.seekTo(START_TIME);
             event.target.playVideo();
-            setInterval(checkLoopTime, 250);
+            setInterval(checkLoopTime, 200);
           },
           onStateChange: (event) => {
             if (event.data === YT.PlayerState.ENDED) {
