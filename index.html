@@ -8,8 +8,7 @@
   <!-- KaTeX for Notebook Textbook Mathematics -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
-          onload="renderMathInElement(document.body);"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -56,7 +55,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.5) 0%, rgba(3, 7, 18, 0.88) 100%);
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(3, 7, 18, 0.85) 100%);
       z-index: 1;
       pointer-events: none;
     }
@@ -138,7 +137,7 @@
 
     .user-bubble {
       align-self: flex-end;
-      background: rgba(30, 41, 59, 0.9);
+      background: rgba(30, 41, 59, 0.92);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(56, 189, 248, 0.7);
@@ -220,15 +219,15 @@
 
     footer {
       position: relative;
-      z-index: 20;
+      z-index: 25;
       padding: 16px 24px;
       border-top: 1px solid rgba(99, 102, 241, 0.3);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
 
-    #chat-form {
+    .input-row {
       display: flex;
       gap: 12px;
       width: 100%;
@@ -308,7 +307,7 @@
         <b>Examples to try:</b>
         <ul style="margin-left: 20px; margin-top: 8px;">
           <li><i>"Build an AI Resume Screener tool with prompt and Python script"</i></li>
-          <li><i>"Design a Customer Sentiment Classifier AI tool"</i></li>
+          <li><i>"Make an AI to write C codes"</i></li>
           <li><i>"Solve \int x^2 \sin(x) dx with step-by-step notebook math"</i></li>
           <li><i>"Plot a 3D surface mesh plot"</i></li>
         </ul>
@@ -317,48 +316,52 @@
   </div>
 
   <footer>
-    <form id="chat-form" onsubmit="event.preventDefault(); handleSend();">
-      <button class="btn-main" type="button" onclick="startVoiceInput()">🎤 Speak</button>
+    <div class="input-row">
+      <button class="btn-main" id="speak-btn" type="button">🎤 Speak</button>
       <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." autocomplete="off">
-      <button class="btn-main" id="send-btn" type="submit">Send ➔</button>
-    </form>
+      <button class="btn-main" id="send-btn" type="button">Send ➔</button>
+    </div>
   </footer>
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     /* =========================================================
-       1. YOUTUBE BACKGROUND LOOP CONTROLLER (4s -> 60s)
+       1. YOUTUBE BACKGROUND LOOP (4s -> 60s)
        ========================================================= */
     let player;
     const START_TIME = 4;
     const END_TIME = 60;
 
     function onYouTubeIframeAPIReady() {
-      player = new YT.Player('bg-player', {
-        events: {
-          onReady: (event) => {
-            event.target.mute();
-            event.target.seekTo(START_TIME, true);
-            event.target.playVideo();
+      try {
+        player = new YT.Player('bg-player', {
+          events: {
+            onReady: (event) => {
+              event.target.mute();
+              event.target.seekTo(START_TIME, true);
+              event.target.playVideo();
 
-            setInterval(() => {
-              if (player && player.getCurrentTime) {
-                const cur = player.getCurrentTime();
-                if (cur >= END_TIME || cur < START_TIME) {
-                  player.seekTo(START_TIME, true);
-                  player.playVideo();
+              setInterval(() => {
+                if (player && player.getCurrentTime) {
+                  const cur = player.getCurrentTime();
+                  if (cur >= END_TIME || cur < START_TIME) {
+                    player.seekTo(START_TIME, true);
+                    player.playVideo();
+                  }
                 }
+              }, 300);
+            },
+            onStateChange: (event) => {
+              if (event.data === YT.PlayerState.ENDED) {
+                player.seekTo(START_TIME, true);
+                player.playVideo();
               }
-            }, 300);
-          },
-          onStateChange: (event) => {
-            if (event.data === YT.PlayerState.ENDED) {
-              player.seekTo(START_TIME, true);
-              player.playVideo();
             }
           }
-        }
-      });
+        });
+      } catch (e) {
+        console.warn("YouTube API init:", e);
+      }
     }
 
     window.addEventListener('click', () => {
@@ -369,38 +372,58 @@
     }, { once: true });
 
     /* =========================================================
-       2. INPUT HANDLING & BACKEND COMMUNICATION
+       2. FAIL-SAFE EVENT BINDING & EXECUTION
        ========================================================= */
-    const inputField = document.getElementById("user-input");
-    const sendButton = document.getElementById("send-btn");
-    const chatBox = document.getElementById("chat-box");
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
 
-    async function handleSend() {
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputField = document.getElementById("user-input");
+      const sendBtn = document.getElementById("send-btn");
+      const speakBtn = document.getElementById("speak-btn");
+
+      sendBtn.addEventListener("click", executeSend);
+      
+      inputField.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          executeSend();
+        }
+      });
+
+      if (speakBtn) {
+        speakBtn.addEventListener("click", startVoiceInput);
+      }
+    });
+
+    async function executeSend() {
+      const inputField = document.getElementById("user-input");
+      const sendButton = document.getElementById("send-btn");
+      const chatBox = document.getElementById("chat-box");
+
       const text = inputField.value.trim();
       if (!text) return;
 
+      // 1. Immediately visually lock and render
       inputField.value = "";
       inputField.disabled = true;
       sendButton.disabled = true;
 
-      // 1. Immediately append user bubble
       const userBubble = document.createElement("div");
       userBubble.className = "user-bubble";
       userBubble.textContent = text;
       chatBox.appendChild(userBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // 2. Immediately append AI loading bubble
       const aiBubble = document.createElement("div");
       aiBubble.className = "ai-bubble";
       aiBubble.innerHTML = `
-        <div class="ai-tag">⚙️️ Sagar'AI Manufacturing Core Active...</div>
+        <div class="ai-tag">⚙ Sagar'AI Manufacturing Core Active...</div>
         <div>Architecting tool system logic, instructions & downloadable payload...</div>
       `;
       chatBox.appendChild(aiBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
 
+      // 2. Transmit to backend
       try {
         const response = await fetch(API_ENDPOINT, {
           method: "POST",
@@ -409,11 +432,11 @@
         });
 
         if (!response.ok) {
-          throw new Error(`Server returned HTTP ${response.status}`);
+          throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
         }
 
         const data = await response.json();
-        const rawContent = data.text || "Tool generation complete.";
+        const rawContent = data.text || "Tool manufactured successfully.";
 
         let formatted = rawContent
           .replace(/```python([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>')
@@ -434,7 +457,7 @@
           aiBubble.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
         }
 
-        // Action Buttons: Download Tool & Read Aloud
+        // Action Toolbar: Download Tool + Read Aloud
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "actions-bar";
 
@@ -452,19 +475,26 @@
         actionsDiv.appendChild(readBtn);
         aiBubble.appendChild(actionsDiv);
 
-        if (window.renderMathInElement) {
-          renderMathInElement(aiBubble, {
-            delimiters: [
-              { left: "$$", right: "$$", display: true },
-              { left: "$", right: "$", display: false }
-            ]
-          });
+        // Safe KaTeX rendering without crashing script
+        try {
+          if (window.renderMathInElement) {
+            renderMathInElement(aiBubble, {
+              delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false }
+              ],
+              throwOnError: false
+            });
+          }
+        } catch (mErr) {
+          console.warn("Math rendering skipped:", mErr);
         }
 
       } catch (err) {
         aiBubble.innerHTML = `
-          <div class="ai-tag" style="color: #f87171;">⚠️ Engine Notice</div>
-          <div>Could not connect to engine backend. (${err.message}).<br>Please wait 30 seconds if the free backend instance is waking up, then try again.</div>
+          <div class="ai-tag" style="color: #f87171;">⚠️ Connection Notice</div>
+          <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
+          <i>Note: If Render put the instance to sleep, it takes ~35 seconds on the first request to wake up. Please wait 15 seconds and try sending again.</i></div>
         `;
       } finally {
         inputField.disabled = false;
@@ -475,7 +505,7 @@
     }
 
     /* =========================================================
-       3. DOWNLOAD AI TOOL EXPORTER (.c, .py, or .md)
+       3. DOWNLOAD TOOL EXPORTER (.c, .py, or .md)
        ========================================================= */
     function downloadAITool(fullContent, promptTopic) {
       let ext = "txt";
@@ -529,8 +559,8 @@
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recog = new SR();
         recog.onresult = (e) => {
-          inputField.value = e.results[0][0].transcript;
-          handleSend();
+          document.getElementById("user-input").value = e.results[0][0].transcript;
+          executeSend();
         };
         recog.start();
       } else {
