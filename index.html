@@ -195,8 +195,8 @@
     <div class="brand-title">Sagar'AI factory</div>
     <div class="brand-motto">⚡ <b>Motto:</b> We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions.</div>
     <div class="leadership-bar">
-      <span class="leader-badge ceo-badge">👑 Founder and CEO: SAGAR MANIKANTA CHOUDHARI</span>
-      <span class="leader-badge cofounder-badge">⚡ CO-FOUNDER: J.Y.N.V.Subhash</span>
+      <span class="leader-badge ceo-badge">By SAGAR MANIKANTA CHOUDHARI</span>
+      <span class="leader-badge cofounder-badge">By J.Y.N.V.Subhash</span>
     </div>
   </header>
 
@@ -204,4 +204,100 @@
     <div class="ai-bubble">
       <div class="ai-tag">✨ Sagar'AI Factory Initialized</div>
       <div>
-        Welcome
+        Welcome to <b>Sagar'AI factory</b>.
+        <br><br>
+        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand.
+        <br><br>
+        <b>Examples to try:</b>
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li><i>"Build an AI Resume Screener tool with prompt and Python script"</i></li>
+          <li><i>"Design a Customer Sentiment Classifier AI tool"</i></li>
+          <li><i>"Solve \int x^2 \sin(x) dx with step-by-step notebook math"</i></li>
+          <li><i>"Plot a 3D surface mesh plot"</i></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <button class="btn" onclick="startVoiceInput()">🎤 Speak</button>
+    <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." onkeydown="if(event.key==='Enter') sendPrompt()">
+    <button class="btn" onclick="sendPrompt()">Send ➔</button>
+  </footer>
+
+  <script>
+    const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
+
+    async function sendPrompt() {
+      const input = document.getElementById("user-input");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+
+      const box = document.getElementById("chat-box");
+      box.innerHTML += `<div class="user-bubble">${text}</div>`;
+      box.scrollTop = box.scrollHeight;
+
+      const aiMsg = document.createElement("div");
+      aiMsg.className = "ai-bubble";
+      aiMsg.innerHTML = `<div class="ai-tag">✨ Sagar'AI Manufacturing Tool...</div><div>Synthesizing architecture, instructions & code...</div>`;
+      box.appendChild(aiMsg);
+      box.scrollTop = box.scrollHeight;
+
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await response.json();
+
+        aiMsg.innerHTML = `<div class="ai-tag">✨ Sagar'AI Output</div><div>${data.text}</div>`;
+
+        if (data.plot_image) {
+          aiMsg.innerHTML += `<div><img class="rendered-plot" src="data:image/png;base64,${data.plot_image}" alt="Rendered Plot" /></div>`;
+        }
+
+        if (data.qr_image) {
+          aiMsg.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
+        }
+
+        aiMsg.innerHTML += `<button class="btn btn-voice-read" onclick="speakText(this.parentElement.innerText)">🔊 Read Aloud</button>`;
+
+        renderMathInElement(aiMsg, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ]
+        });
+
+      } catch (err) {
+        aiMsg.innerHTML = `<div class="ai-tag">⚠️ Notice</div><div>Server waking up or processing. Free instances take roughly 40 seconds on the first call. (${err.message})</div>`;
+      }
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function speakText(content) {
+      window.speechSynthesis.cancel();
+      const clean = content.replace(/\\$+/g, '').replace(/[*_#`]/g, '');
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.0;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function startVoiceInput() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recog = new SR();
+        recog.onresult = (e) => {
+          document.getElementById("user-input").value = e.results[0][0].transcript;
+          sendPrompt();
+        };
+        recog.start();
+      } else {
+        alert("Speech Recognition is not supported by your browser.");
+      }
+    }
+  </script>
+</body>
+</html>
