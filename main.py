@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
@@ -22,9 +22,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 class ChatRequest(BaseModel):
     message: str
@@ -58,8 +55,14 @@ def health():
 
 @app.post("/api/chat")
 async def chat_handler(req: ChatRequest):
-    if not client:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is not configured.")
+    groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+
+    if not groq_key:
+        return {
+            "text": "⚠️ **Configuration Notice:** `GROQ_API_KEY` is missing in Render Environment variables. Please go to your Render Dashboard -> Environment and add `GROQ_API_KEY`.",
+            "plot_image": None,
+            "qr_image": None
+        }
 
     system_directive = (
         "You are 'Sagar'AI factory', an advanced AI Tool Builder and Generator founded by "
@@ -67,7 +70,7 @@ async def chat_handler(req: ChatRequest):
         "OUR CORE MOTTO: 'We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions.'\n\n"
         "CORE CAPABILITIES:\n"
         "1. AI TOOL MAKER: When a user asks to build or design an AI tool, architect the complete tool: "
-        "provide the system prompt, tool logic, API architecture, and ready-to-run code.\n"
+        "provide the system prompt, tool logic, API architecture, and ready-to-run code (Python, C, JavaScript, etc.).\n"
         "2. NOTEBOOK MATHEMATICS: NEVER output raw syntax like `x**2` or plain brackets `[ ... ]`. "
         "ALWAYS use textbook LaTeX ($inline$ for inline formulas, $$display$$ for standalone equations).\n"
         "3. AUTONOMOUS VISUALIZATION: When requested to plot, chart, or generate a graph, provide clean executable Python code using `np`, `plt`, and `ax` inside ```python ``` blocks.\n"
@@ -76,8 +79,9 @@ async def chat_handler(req: ChatRequest):
     )
 
     try:
+        client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_directive},
                 {"role": "user", "content": req.message}
@@ -87,7 +91,11 @@ async def chat_handler(req: ChatRequest):
         )
         ai_text = response.choices[0].message.content
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"LLM Inference Error: {str(e)}")
+        return {
+            "text": f"⚠️ **Groq API Error:** {str(e)}",
+            "plot_image": None,
+            "qr_image": None
+        }
 
     plot_image = None
     py_blocks = re.findall(r"```python\s*(.*?)\s*```", ai_text, re.DOTALL)
