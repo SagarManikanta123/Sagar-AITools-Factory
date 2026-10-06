@@ -15,7 +15,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     
     body {
-      background-color: #070913;
+      background-color: #05070f;
       color: #f1f5f9;
       height: 100vh;
       display: flex;
@@ -25,28 +25,38 @@
     }
 
     /* Video Background Container */
-    #bg-video {
+    .video-background {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       z-index: -2;
-      transform: translate(-50%, -50%);
-      object-fit: cover;
-      filter: brightness(0.38) contrast(1.15) saturate(1.2);
+      overflow: hidden;
+      pointer-events: none;
     }
 
-    /* Overlay Layer for Readability */
+    .video-background iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 56.25vw; /* 16:9 Aspect Ratio */
+      min-height: 100vh;
+      min-width: 177.77vh; /* 16:9 Aspect Ratio */
+      transform: translate(-50%, -50%) scale(1.15);
+      pointer-events: none;
+      filter: brightness(0.45) contrast(1.1);
+    }
+
+    /* Dark gradient overlay to preserve UI contrast */
     .video-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(7, 9, 19, 0.85) 100%);
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(5, 7, 15, 0.82) 100%);
       z-index: -1;
       pointer-events: none;
     }
@@ -126,7 +136,7 @@
 
     .user-bubble {
       align-self: flex-end;
-      background: rgba(30, 41, 59, 0.78);
+      background: rgba(30, 41, 59, 0.8);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(56, 189, 248, 0.7);
@@ -139,7 +149,7 @@
 
     .ai-bubble {
       align-self: flex-start;
-      background: rgba(20, 24, 48, 0.82);
+      background: rgba(20, 24, 48, 0.84);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(168, 85, 247, 0.55);
@@ -221,10 +231,15 @@
 </head>
 <body>
 
-  <!-- Video Background Element -->
-  <video autoplay muted loop playsinline id="bg-video">
-    <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-blue-and-purple-screens-99742-large.mp4" type="video/mp4">
-  </video>
+  <!-- Dynamic YouTube Background -->
+  <div class="video-background">
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/u83VdXAVq08?autoplay=1&mute=1&loop=1&playlist=u83VdXAVq08&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&disablekb=1&fs=0"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
   <div class="video-overlay"></div>
 
   <header>
