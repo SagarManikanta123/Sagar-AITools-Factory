@@ -1,124 +1,555 @@
-import os
-import io
-import re
-import base64
-import qrcode
-import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from groq import Groq
-
-app = FastAPI(title="Sagar'AI factory Engine")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class ChatRequest(BaseModel):
-    message: str
-
-def generate_qr_base64(data: str) -> str:
-    qr = qrcode.QRCode(box_size=8, border=2)
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    return base64.b64encode(buf.getvalue()).decode("utf-8")
-
-def execute_plot_code(code_str: str) -> str:
-    plt.close('all')
-    fig, ax = plt.subplots(figsize=(6, 4))
-    exec_scope = {"plt": plt, "np": np, "fig": fig, "ax": ax}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sagar'AI factory - AI Tools Foundry</title>
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     
-    clean_code = re.sub(r"plt\.show\(.*?\)", "", code_str)
-    exec(clean_code, exec_scope)
-    
-    buf = io.BytesIO()
-    plt.tight_layout()
-    plt.savefig(buf, format="png", dpi=130, facecolor='#0f172a', edgecolor='none')
-    plt.close('all')
-    return base64.b64encode(buf.getvalue()).decode("utf-8")
-
-@app.get("/")
-def health():
-    return {"status": "online", "platform": "Sagar'AI factory"}
-
-@app.post("/api/chat")
-async def chat_handler(req: ChatRequest):
-    groq_key = os.environ.get("GROQ_API_KEY", "").strip()
-
-    if not groq_key:
-        return {
-            "text": "⚠️ **Configuration Notice:** `GROQ_API_KEY` is missing in Render Environment variables. Please go to your Render Dashboard -> Environment and add `GROQ_API_KEY`.",
-            "plot_image": None,
-            "qr_image": None
-        }
-
-    system_directive = (
-        "You are 'Sagar'AI factory', an advanced AI Tool Builder and Generator founded by "
-        "Founder & CEO SAGAR MANIKANTA CHOUDHARI and CO-FOUNDER J.Y.N.V.Subhash.\n"
-        "OUR CORE MOTTO: 'We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions.'\n\n"
-        "CORE CAPABILITIES:\n"
-        "1. AI TOOL MAKER: When a user asks to build or design an AI tool, architect the complete tool: "
-        "provide the system prompt, tool logic, API architecture, and ready-to-run code (Python, C, JavaScript, etc.).\n"
-        "2. NOTEBOOK MATHEMATICS: NEVER output raw syntax like `x**2` or plain brackets `[ ... ]`. "
-        "ALWAYS use textbook LaTeX ($inline$ for inline formulas, $$display$$ for standalone equations).\n"
-        "3. AUTONOMOUS VISUALIZATION: When requested to plot, chart, or generate a graph, provide clean executable Python code using `np`, `plt`, and `ax` inside ```python ``` blocks.\n"
-        "4. QR GENERATOR: When asked for a QR code, end with `GENERATE_QR: <url or text>`.\n"
-        "5. Deliver clear, production-ready deliverables with direct engineering focus."
-    )
-
-    try:
-        client = Groq(api_key=groq_key)
-        response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": system_directive},
-                {"role": "user", "content": req.message}
-            ],
-            temperature=0.5,
-            max_tokens=2048,
-        )
-        ai_text = response.choices[0].message.content
-    except Exception as e:
-        return {
-            "text": f"⚠️ **Groq API Error:** {str(e)}",
-            "plot_image": None,
-            "qr_image": None
-        }
-
-    plot_image = None
-    py_blocks = re.findall(r"```python\s*(.*?)\s*```", ai_text, re.DOTALL)
-    for block in py_blocks:
-        if "plt." in block or "ax." in block:
-            try:
-                plot_image = execute_plot_code(block)
-                break
-            except Exception:
-                pass
-
-    qr_image = None
-    qr_match = re.search(r"GENERATE_QR:\s*(\S+)", ai_text)
-    if qr_match:
-        target = qr_match.group(1).strip()
-        try:
-            qr_image = generate_qr_base64(target)
-            ai_text = re.sub(r"GENERATE_QR:\s*\S+", "", ai_text).strip()
-        except Exception:
-            pass
-
-    return {
-        "text": ai_text,
-        "plot_image": plot_image,
-        "qr_image": qr_image
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #030712;
+      color: #f1f5f9;
+      display: flex;
+      flex-direction: column;
     }
+
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: #030712;
+    }
+
+    .video-background iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 56.25vw;
+      min-height: 100vh;
+      min-width: 177.77vh;
+      transform: translate(-50%, -50%) scale(1.35);
+      border: none;
+      pointer-events: none;
+    }
+
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(3, 7, 18, 0.85) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      z-index: 20;
+      padding: 16px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.35);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(15, 23, 42, 0.85);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-title {
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #e879f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 35px rgba(129, 140, 248, 0.4);
+    }
+
+    .brand-motto {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+    }
+
+    .leadership-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .leader-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .ceo-badge {
+      background: linear-gradient(90deg, rgba(30, 58, 138, 0.85), rgba(88, 28, 135, 0.85));
+      border: 1px solid #c084fc;
+      color: #fdf4ff;
+      box-shadow: 0 0 15px rgba(192, 132, 252, 0.35);
+    }
+
+    .cofounder-badge {
+      background: linear-gradient(90deg, rgba(14, 116, 144, 0.85), rgba(30, 58, 138, 0.85));
+      border: 1px solid #38bdf8;
+      color: #e0f2fe;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
+    }
+
+    #chat-box {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .user-bubble {
+      align-self: flex-end;
+      background: rgba(30, 41, 59, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      border-right: 4px solid #38bdf8;
+      border-radius: 18px 4px 18px 18px;
+      padding: 14px 22px;
+      max-width: 75%;
+      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.2);
+      white-space: pre-wrap;
+    }
+
+    .ai-bubble {
+      align-self: flex-start;
+      background: rgba(20, 24, 48, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.55);
+      border-left: 4px solid #e879f9;
+      border-radius: 4px 20px 20px 20px;
+      padding: 18px 26px;
+      max-width: 82%;
+      line-height: 1.65;
+      box-shadow: 0 10px 35px rgba(168, 85, 247, 0.22);
+    }
+
+    .ai-tag {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #e879f9;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 8px;
+    }
+
+    .rendered-plot {
+      margin-top: 14px;
+      border-radius: 10px;
+      max-width: 100%;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-action {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid #c084fc;
+      color: #f5d0fe;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: #7c3aed;
+      color: #fff;
+    }
+
+    .btn-download {
+      border-color: #38bdf8;
+      color: #bae6fd;
+    }
+
+    .btn-download:hover {
+      background: #0284c7;
+      color: #fff;
+    }
+
+    footer {
+      position: relative;
+      z-index: 25;
+      padding: 16px 24px;
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
+    #user-input {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 12px;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    #user-input:focus {
+      border-color: #e879f9;
+      box-shadow: 0 0 15px rgba(232, 121, 249, 0.35);
+    }
+
+    .btn-main {
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+      transition: transform 0.15s ease, opacity 0.2s;
+    }
+
+    .btn-main:active { transform: scale(0.97); }
+    .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    pre {
+      background: #090d1a;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid rgba(99, 102, 241, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Video -->
+  <div class="video-background">
+    <iframe 
+      id="bg-player"
+      src="https://www.youtube.com/embed/u83VdXAVq08?enablejsapi=1&autoplay=1&mute=1&controls=0&loop=1&playlist=u83VdXAVq08&start=4&end=60&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+  <div class="video-overlay"></div>
+
+  <header>
+    <div class="brand-title">Sagar'AI factory</div>
+    <div class="brand-motto">⚡ <b>Motto:</b> We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions.</div>
+    <div class="leadership-bar">
+      <span class="leader-badge ceo-badge">By SAGAR MANIKANTA CHOUDHARI</span>
+      <span class="leader-badge cofounder-badge">By J.Y.N.V.Subhash</span>
+    </div>
+  </header>
+
+  <div id="chat-box">
+    <div class="ai-bubble">
+      <div class="ai-tag">✨ Sagar'AI Factory Initialized</div>
+      <div>
+        Welcome to <b>Sagar'AI factory</b>.
+        <br><br>
+        We manufacture custom AI tools, computational workflows, and intelligent software agents on demand. Every tool generated can be exported and downloaded directly.
+        <br><br>
+        <b>Examples to try:</b>
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li><i>"Build an AI Resume Screener tool with prompt and Python script"</i></li>
+          <li><i>"Make an AI to write C codes"</i></li>
+          <li><i>"Solve \int x^2 \sin(x) dx with step-by-step notebook math"</i></li>
+          <li><i>"Plot a 3D surface mesh plot"</i></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="input-row">
+      <button class="btn-main" id="speak-btn" type="button" onclick="startVoiceInput()">🎤 Speak</button>
+      <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture or problem to solve..." autocomplete="off">
+      <button class="btn-main" id="send-btn" type="button" onclick="executeSend()">Send ➔</button>
+    </div>
+  </footer>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("user-input");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          executeSend();
+        }
+      });
+    });
+
+    async function executeSend() {
+      const inputField = document.getElementById("user-input");
+      const sendButton = document.getElementById("send-btn");
+      const chatBox = document.getElementById("chat-box");
+
+      const text = inputField.value.trim();
+      if (!text) return;
+
+      inputField.value = "";
+      inputField.disabled = true;
+      sendButton.disabled = true;
+
+      const userBubble = document.createElement("div");
+      userBubble.className = "user-bubble";
+      userBubble.textContent = text;
+      chatBox.appendChild(userBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const aiBubble = document.createElement("div");
+      aiBubble.className = "ai-bubble";
+      aiBubble.innerHTML = `
+        <div class="ai-tag">⚙ Sagar'AI Manufacturing Core Active...</div>
+        <div>Architecting tool system logic, instructions & downloadable payload...</div>
+      `;
+      chatBox.appendChild(aiBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+        const rawContent = data.text || "Tool manufactured successfully.";
+
+        let formatted = rawContent
+          .replace(/```python([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>')
+          .replace(/```c([\s\S]*?)```/g, '<pre><code class="language-c">$1</code></pre>')
+          .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+          .replace(/\n/g, '<br>');
+
+        aiBubble.innerHTML = `
+          <div class="ai-tag">✨ Sagar'AI Manufactured Tool</div>
+          <div>${formatted}</div>
+        `;
+
+        if (data.plot_image) {
+          aiBubble.innerHTML += `<div><img class="rendered-plot" src="data:image/png;base64,${data.plot_image}" alt="Rendered Plot" /></div>`;
+        }
+
+        if (data.qr_image) {
+          aiBubble.innerHTML += `<div><img class="rendered-plot" style="width: 170px;" src="data:image/png;base64,${data.qr_image}" alt="QR Code" /></div>`;
+        }
+
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "actions-bar";
+
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "btn-action btn-download";
+        downloadBtn.innerHTML = "📥 Download AI Tool";
+        downloadBtn.onclick = () => downloadAITool(rawContent, text);
+
+        const readBtn = document.createElement("button");
+        readBtn.className = "btn-action";
+        readBtn.innerHTML = "🔊 Read Aloud";
+        readBtn.onclick = () => speakText(rawContent);
+
+        actionsDiv.appendChild(downloadBtn);
+        actionsDiv.appendChild(readBtn);
+        aiBubble.appendChild(actionsDiv);
+
+        if (window.renderMathInElement) {
+          try {
+            renderMathInElement(aiBubble, {
+              delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false }
+              ],
+              throwOnError: false
+            });
+          } catch(e) {}
+        }
+
+      } catch (err) {
+        aiBubble.innerHTML = `
+          <div class="ai-tag" style="color: #f87171;">⚠ Connection Notice</div>
+          <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
+          <i>If the Render backend is waking up from sleep, please wait 15 seconds and try again.</i></div>
+        `;
+      } finally {
+        inputField.disabled = false;
+        sendButton.disabled = false;
+        inputField.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    function downloadAITool(fullContent, promptTopic) {
+      let ext = "txt";
+      let codeMatch = fullContent.match(/```(c|cpp|python|js|bash)?\s*([\s\S]*?)```/);
+      let fileData = "";
+
+      if (codeMatch && codeMatch[2]) {
+        const lang = (codeMatch[1] || "").toLowerCase();
+        if (lang === "c" || lang === "cpp") ext = "c";
+        else if (lang === "python") ext = "py";
+        else ext = "txt";
+
+        fileData = `/* ==========================================================\n` +
+                   ` * MANUFACTURED BY: Sagar'AI factory\n` +
+                   ` * Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
+                   ` * Co-Founder: J.Y.N.V.Subhash\n` +
+                   ` * Prompt: ${promptTopic}\n` +
+                   ` * ========================================================== */\n\n` +
+                   codeMatch[2].trim() + "\n";
+      } else {
+        ext = "md";
+        fileData = `# MANUFACTURED BY: Sagar'AI factory\n` +
+                   `# Founder & CEO: SAGAR MANIKANTA CHOUDHARI\n` +
+                   `# Co-Founder: J.Y.N.V.Subhash\n` +
+                   `# Prompt: ${promptTopic}\n\n` +
+                   fullContent;
+      }
+
+      const filename = `manufactured_ai_tool.${ext}`;
+      const blob = new Blob([fileData], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    let recognition = null;
+    function startVoiceInput() {
+      const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechClass) {
+        alert("Your browser does not support Speech Recognition. Please use Google Chrome.");
+        return;
+      }
+
+      const speakBtn = document.getElementById("speak-btn");
+
+      if (recognition) {
+        try { recognition.abort(); } catch(e) {}
+      }
+
+      recognition = new SpeechClass();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      speakBtn.innerText = "🎙 Listening...";
+
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        document.getElementById("user-input").value = transcript;
+        speakBtn.innerText = "🎤 Speak";
+        executeSend();
+      };
+
+      recognition.onerror = (e) => {
+        speakBtn.innerText = "🎤 Speak";
+        if (e.error !== 'aborted' && e.error !== 'no-speech') {
+          console.warn("Speech warning:", e.error);
+        }
+      };
+
+      recognition.onend = () => {
+        speakBtn.innerText = "🎤 Speak";
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        speakBtn.innerText = "🎤 Speak";
+      }
+    }
+
+    function speakText(content) {
+      window.speechSynthesis.cancel();
+      const clean = content.replace(/\$/g, '').replace(/[*_#`]/g, '');
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.0;
+      window.speechSynthesis.speak(utter);
+    }
+
+    let player;
+    function onYouTubeIframeAPIReady() {
+      try {
+        player = new YT.Player('bg-player', {
+          events: {
+            onReady: (event) => {
+              event.target.mute();
+              event.target.seekTo(4, true);
+              event.target.playVideo();
+              setInterval(() => {
+                if (player && player.getCurrentTime) {
+                  const cur = player.getCurrentTime();
+                  if (cur >= 60 || cur < 4) {
+                    player.seekTo(4, true);
+                    player.playVideo();
+                  }
+                }
+              }, 300);
+            }
+          }
+        });
+      } catch(e) {}
+    }
+  </script>
+</body>
+</html>
