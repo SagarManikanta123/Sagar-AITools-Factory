@@ -36,7 +36,7 @@
       pointer-events: none;
     }
 
-    .video-background iframe {
+    .video-background #ytplayer {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -233,12 +233,7 @@
 
   <!-- Dynamic YouTube Background -->
   <div class="video-background">
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/u83VdXAVq08?autoplay=1&mute=1&loop=1&playlist=u83VdXAVq08&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&disablekb=1&fs=0"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>
-    </iframe>
+    <div id="ytplayer"></div>
   </div>
   <div class="video-overlay"></div>
 
@@ -276,8 +271,57 @@
     <button class="btn" onclick="sendPrompt()">Send ➔</button>
   </footer>
 
+  <!-- YouTube IFrame API Script -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
   <script>
     const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
+
+    // YouTube Loop Controller (7s to 60s)
+    let player;
+    const START_TIME = 7;
+    const END_TIME = 60;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('ytplayer', {
+        videoId: 'u83VdXAVq08',
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          showinfo: 0,
+          rel: 0,
+          modestbranding: 1,
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          start: START_TIME,
+          end: END_TIME
+        },
+        events: {
+          onReady: (event) => {
+            event.target.mute();
+            event.target.seekTo(START_TIME);
+            event.target.playVideo();
+            setInterval(checkLoopTime, 250);
+          },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.ENDED) {
+              player.seekTo(START_TIME);
+              player.playVideo();
+            }
+          }
+        }
+      });
+    }
+
+    function checkLoopTime() {
+      if (player && player.getCurrentTime) {
+        const currentTime = player.getCurrentTime();
+        if (currentTime >= END_TIME || currentTime < START_TIME) {
+          player.seekTo(START_TIME);
+        }
+      }
+    }
 
     async function sendPrompt() {
       const input = document.getElementById("user-input");
