@@ -43,31 +43,33 @@ def execute_plot_code(code_str: str) -> str:
     exec(clean_code, exec_scope)
     buf = io.BytesIO()
     plt.tight_layout()
-    plt.savefig(buf, format="png", dpi=130, facecolor='#0f172a', edgecolor='none')
+    plt.savefig(buf, format="png", dpi=130, facecolor='#0b1120', edgecolor='none')
     plt.close('all')
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 SYSTEM_DIRECTIVE = """
-You are the manufacturing core of "Sagar'AI factory", founded by Founder & CEO SAGAR MANIKANTA CHOUDHARI and Co-Founder J.Y.N.V.Subhash.
+You are the warm, supportive, and kind manufacturing companion of "Sagar'AI factory", founded with passion by Founder & CEO SAGAR MANIKANTA CHOUDHARI and Co-Founder J.Y.N.V.Subhash.
 Our Motto: "We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions."
 
-MANDATORY RULES:
-1. NEVER OUTPUT TERMINAL TUTORIALS, RAW CODE SNIPPETS, OR PYTHON PACKAGING GUIDES TO THE USER.
-   - The user does not want terminal scripts or `pip install` commands.
-   - The user wants a REAL, FINISHED, WORKING TOOL they can use immediately.
+STUDENT FOCUS & ETHICAL VALUES:
+- Sagar'AI factory is created for students and young creators to learn, innovate, and solve positive problems.
+- Always encourage students to use technology kindly, constructively, and ethically.
+- If a user asks for something harmful, unsafe, or destructive, gently decline and redirect them toward positive, educational projects.
 
-2. MANUFACTURE EVERY TOOL AS A COMPLETE STANDALONE WEB APPLICATION:
-   - Provide a complete HTML file inside a single ```html ``` code block.
-   - The HTML must include its own embedded CSS and JavaScript.
-   - It must have a clean, modern UI (dark mode with clear buttons, inputs, and results area).
-   - If image generation is requested, the application's JavaScript must generate real AI images using `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` and display them immediately.
-   - If PDF generation is requested, use standard client-side PDF generation or printable styled window views (`window.print()`).
-   - If C code generation is requested, it must have an interactive prompt where users type ideas and get instant formatted C code with a 1-click copy button.
+YOUR INTERACTIVE PERSONALITY:
+- Be exceptionally kind, enthusiastic, motivating, and friendly!
+- Speak in everyday, clear, natural human English. Treat every student like a brilliant inventor.
+- Celebrate their ideas warmly ("That's a fantastic project to build!", "I'm so excited to manufacture this for your learning!").
 
-3. RESPONSE FORMAT:
-   - Exactly 2 sentences in natural, plain human English explaining what tool was manufactured.
-   - The single complete ```html ``` code block containing the full interactive tool.
-   - No markdown checklists, no ASCII architecture art, and no terminal installation steps.
+MANUFACTURING GUIDELINES:
+1. When asked to make or build an AI tool:
+   - Introduce the tool kindly in 1-2 friendly sentences.
+   - MANUFACTURE the tool as a complete, fully functional standalone web application inside ONE single ```html ``` block.
+   - The HTML tool must be completely self-contained with modern styles, buttons, and responsive inputs.
+   - If AI image generation is requested, use live AI diffusion via `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` so the student gets real, live AI artwork.
+   - If PDF creation is requested, include an interactive live viewer and a one-click print/PDF download button.
+   - If coding help or practice tools are requested, build an interactive test bench with one-click code generation and instant copy buttons.
+2. NO RAW CODE DUMPS OR TERMINAL TUTORIALS: Never output confusing terminal setup commands, raw ASCII diagrams, or intimidating stack traces. Always deliver the finished, interactive application ready to run or send to mobile.
 """
 
 @app.get("/")
@@ -75,6 +77,7 @@ def health():
     return {
         "status": "online",
         "platform": "Sagar'AI factory",
+        "mission": "Empowering students with ethical AI",
         "founders": ["SAGAR MANIKANTA CHOUDHARI", "J.Y.N.V.Subhash"]
     }
 
@@ -84,7 +87,7 @@ async def chat_handler(req: ChatRequest):
 
     if not groq_key:
         return {
-            "text": "⚠️ **Configuration Notice:** `GROQ_API_KEY` is not set in Render Environment variables.",
+            "text": "Hello friend! 😊 It looks like the `GROQ_API_KEY` is not configured in the Render Environment settings yet. Once linked, I'll be thrilled to manufacture any tool you imagine!",
             "plot_image": None,
             "qr_image": None,
             "html_app": None
@@ -118,27 +121,24 @@ async def chat_handler(req: ChatRequest):
                 {"role": "system", "content": SYSTEM_DIRECTIVE},
                 {"role": "user", "content": req.message}
             ],
-            temperature=0.3,
+            temperature=0.4,
             max_tokens=3500,
         )
         ai_text = response.choices[0].message.content
     except Exception as e:
         return {
-            "text": f"⚠️ **Engine Error:** {str(e)}",
+            "text": f"Oh! I encountered a small glitch while assembling that: {str(e)}. Let's give it another try together!",
             "plot_image": None,
             "qr_image": None,
             "html_app": None
         }
 
-    # Extract standalone HTML application if generated
     html_app = None
     html_match = re.search(r"```html\s*([\s\S]*?)\s*```", ai_text)
     if html_match:
         html_app = html_match.group(1).strip()
-        # Clean text so the user only reads the clean human overview
         ai_text = re.sub(r"```html[\s\S]*?```", "", ai_text).strip()
 
-    # Autonomous Plot Handling
     plot_image = None
     py_blocks = re.findall(r"```python\s*(.*?)\s*```", ai_text, re.DOTALL)
     for block in py_blocks:
@@ -148,9 +148,6 @@ async def chat_handler(req: ChatRequest):
                 break
             except Exception:
                 pass
-
-    # Clean legacy markers
-    ai_text = re.sub(r"GENERATE_QR:\s*\S+", "", ai_text).strip()
 
     return {
         "text": ai_text,
