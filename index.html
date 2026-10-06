@@ -29,7 +29,6 @@
       flex-direction: column;
     }
 
-    /* Executive Branding Header */
     header {
       padding: 18px 28px;
       display: flex;
@@ -84,7 +83,6 @@
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
     }
 
-    /* Chat Interactive Area */
     #chat-box {
       flex: 1;
       overflow-y: auto;
@@ -134,7 +132,6 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
-    /* Controls Bar */
     footer {
       padding: 16px 24px;
       display: flex;
@@ -208,8 +205,8 @@
   </footer>
 
   <script>
-    // Point this to your live cloud API (set in Step 2)
-    const API_ENDPOINT = "https://sagar-ai-backend.onrender.com/api/chat";
+    // Connected to your live Render backend
+    const API_ENDPOINT = "https://sagar-aitools-factory.onrender.com/api/chat";
 
     async function sendPrompt() {
       const input = document.getElementById("user-input");
@@ -247,7 +244,6 @@
 
         aiMsg.innerHTML += `<button class="btn btn-voice-read" onclick="speakText(this.parentElement.innerText)">🔊 Read Aloud</button>`;
 
-        // Render textbook LaTeX math
         renderMathInElement(aiMsg, {
           delimiters: [
             { left: "$$", right: "$$", display: true },
@@ -256,7 +252,7 @@
         });
 
       } catch (err) {
-        aiMsg.innerHTML = `<div class="ai-tag">⚠️ Connection Notice</div><div>Backend server initializing or offline. If newly deployed on Render, please allow 30 seconds for initial spin-up. (${err.message})</div>`;
+        aiMsg.innerHTML = `<div class="ai-tag">⚠️ Notice</div><div>Server waking up or processing. Free instances take roughly 40 seconds to spin up on first call. (${err.message})</div>`;
       }
       box.scrollTop = box.scrollHeight;
     }
