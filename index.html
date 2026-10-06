@@ -6,18 +6,30 @@
   <title>Sagar'AI factory - AI Tools Foundry</title>
   
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
     
+    :root {
+      --primary: #06b6d4;
+      --primary-glow: rgba(6, 182, 212, 0.4);
+      --secondary: #a855f7;
+      --secondary-glow: rgba(168, 85, 247, 0.35);
+      --accent: #f43f5e;
+      --bg-glass: rgba(11, 17, 32, 0.78);
+      --card-glass: rgba(15, 23, 42, 0.85);
+      --border-glow: rgba(56, 189, 248, 0.3);
+    }
+
     html, body {
       width: 100%;
       height: 100vh;
       overflow: hidden;
-      background: #030712;
-      color: #f1f5f9;
+      background: #020617;
+      color: #f8fafc;
       display: flex;
       flex-direction: column;
     }
 
+    /* Video Background Container (Retained Exactly) */
     .video-background {
       position: fixed;
       top: 0;
@@ -27,7 +39,7 @@
       z-index: 0;
       overflow: hidden;
       pointer-events: none;
-      background: #030712;
+      background: #020617;
     }
 
     .video-background iframe {
@@ -43,46 +55,83 @@
       pointer-events: none;
     }
 
+    /* Vibrant Multi-Color Aurora Glassmorphism Overlay */
     .video-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(3, 7, 18, 0.85) 100%);
+      background: radial-gradient(circle at 20% 15%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 85%, rgba(168, 85, 247, 0.18) 0%, transparent 50%),
+                  radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(2, 6, 23, 0.88) 100%);
       z-index: 1;
       pointer-events: none;
+    }
+
+    /* Top Kind-Usage Student Banner */
+    .student-guidance-banner {
+      position: relative;
+      z-index: 30;
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.95), rgba(99, 102, 241, 0.95), rgba(168, 85, 247, 0.95));
+      color: #ffffff;
+      padding: 8px 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      box-shadow: 0 2px 15px rgba(6, 182, 212, 0.35);
+      letter-spacing: 0.2px;
+    }
+
+    .banner-pill {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
     }
 
     header {
       position: relative;
       z-index: 20;
-      padding: 16px 28px;
+      padding: 14px 28px;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      border-bottom: 1px solid rgba(168, 85, 247, 0.35);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      background: rgba(15, 23, 42, 0.85);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid var(--border-glow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: var(--bg-glass);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .brand-title {
       font-size: 2.1rem;
       font-weight: 900;
       letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #e879f9);
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 35px rgba(129, 140, 248, 0.4);
+      text-shadow: 0 0 40px var(--primary-glow);
     }
 
     .brand-motto {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: #cbd5e1;
       font-weight: 500;
-      letter-spacing: 0.4px;
     }
 
     .leadership-bar {
@@ -90,7 +139,6 @@
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
-      margin-top: 4px;
     }
 
     .leader-badge {
@@ -99,20 +147,20 @@
       gap: 6px;
       padding: 4px 14px;
       border-radius: 9999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.3px;
     }
 
     .ceo-badge {
-      background: linear-gradient(90deg, rgba(30, 58, 138, 0.85), rgba(88, 28, 135, 0.85));
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(88, 28, 135, 0.85));
       border: 1px solid #c084fc;
       color: #fdf4ff;
       box-shadow: 0 0 15px rgba(192, 132, 252, 0.35);
     }
 
     .cofounder-badge {
-      background: linear-gradient(90deg, rgba(14, 116, 144, 0.85), rgba(30, 58, 138, 0.85));
+      background: linear-gradient(135deg, rgba(14, 116, 144, 0.85), rgba(30, 58, 138, 0.85));
       border: 1px solid #38bdf8;
       color: #e0f2fe;
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
@@ -131,83 +179,118 @@
 
     .user-bubble {
       align-self: flex-end;
-      background: rgba(30, 41, 59, 0.92);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(56, 189, 248, 0.7);
-      border-right: 4px solid #38bdf8;
-      border-radius: 18px 4px 18px 18px;
+      border-right: 4px solid var(--primary);
+      border-radius: 20px 4px 20px 20px;
       padding: 14px 22px;
       max-width: 75%;
-      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.2);
+      box-shadow: 0 6px 30px rgba(6, 182, 212, 0.2);
       white-space: pre-wrap;
+      font-size: 0.96rem;
     }
 
     .ai-bubble {
       align-self: flex-start;
-      background: rgba(20, 24, 48, 0.94);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(24, 20, 54, 0.94));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(168, 85, 247, 0.55);
-      border-left: 4px solid #e879f9;
-      border-radius: 4px 20px 20px 20px;
-      padding: 20px 26px;
-      max-width: 84%;
-      line-height: 1.65;
-      box-shadow: 0 10px 35px rgba(168, 85, 247, 0.22);
+      border-left: 4px solid var(--secondary);
+      border-radius: 4px 22px 22px 22px;
+      padding: 22px 28px;
+      max-width: 85%;
+      line-height: 1.68;
+      box-shadow: 0 12px 40px rgba(168, 85, 247, 0.22);
+      transition: all 0.2s ease;
     }
 
     .ai-tag {
       font-size: 0.8rem;
       font-weight: 800;
       color: #e879f9;
-      text-transform: uppercase;
       letter-spacing: 1.2px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .chip-btn {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #bae6fd;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .chip-btn:hover {
+      background: linear-gradient(90deg, #0284c7, #2563eb);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px var(--primary-glow);
     }
 
     .tool-choice-panel {
-      margin-top: 16px;
-      padding: 16px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      border-radius: 14px;
+      margin-top: 18px;
+      padding: 18px 22px;
+      background: rgba(11, 17, 32, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     }
 
     .tool-choice-title {
-      font-weight: 700;
+      font-weight: 800;
       color: #38bdf8;
-      font-size: 0.95rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .actions-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
     .btn-action {
       background: rgba(30, 41, 59, 0.95);
       border: 1px solid #c084fc;
       color: #f5d0fe;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 0.88rem;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .btn-action:hover {
-      background: #7c3aed;
-      color: #fff;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(192, 132, 252, 0.35);
     }
 
     .btn-run {
@@ -217,7 +300,7 @@
     }
 
     .btn-run:hover {
-      background: linear-gradient(90deg, #0369a1, #1d4ed8);
+      box-shadow: 0 8px 22px var(--primary-glow);
     }
 
     .btn-mobile {
@@ -227,22 +310,22 @@
     }
 
     .btn-mobile:hover {
-      background: linear-gradient(90deg, #047857, #059669);
+      box-shadow: 0 8px 22px rgba(52, 211, 153, 0.4);
     }
 
     footer {
       position: relative;
       z-index: 25;
-      padding: 16px 24px;
-      border-top: 1px solid rgba(99, 102, 241, 0.3);
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      padding: 18px 28px;
+      border-top: 1px solid var(--border-glow);
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
 
     .input-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       width: 100%;
     }
 
@@ -251,27 +334,34 @@
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid rgba(99, 102, 241, 0.5);
       color: #fff;
-      padding: 14px 20px;
-      border-radius: 12px;
+      padding: 15px 22px;
+      border-radius: 14px;
       outline: none;
-      font-size: 1rem;
+      font-size: 1.02rem;
+      transition: all 0.2s ease;
     }
 
     #user-input:focus {
-      border-color: #e879f9;
-      box-shadow: 0 0 15px rgba(232, 121, 249, 0.35);
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px var(--primary-glow);
     }
 
     .btn-main {
-      background: linear-gradient(90deg, #6366f1, #a855f7);
+      background: linear-gradient(135deg, #0284c7, #9333ea);
       color: #fff;
       border: none;
-      padding: 12px 24px;
-      border-radius: 12px;
+      padding: 12px 26px;
+      border-radius: 14px;
       font-weight: 700;
+      font-size: 0.95rem;
       cursor: pointer;
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
-      transition: transform 0.15s ease, opacity 0.2s;
+      box-shadow: 0 4px 18px rgba(147, 51, 234, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(2, 132, 199, 0.5);
     }
 
     .btn-main:active { transform: scale(0.97); }
@@ -285,8 +375,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(3, 7, 18, 0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
       z-index: 100;
       justify-content: center;
       align-items: center;
@@ -295,19 +385,19 @@
 
     .modal-frame {
       width: 95%;
-      max-width: 900px;
+      max-width: 920px;
       height: 85vh;
-      background: #0f172a;
+      background: #0b1120;
       border: 2px solid #38bdf8;
-      border-radius: 16px;
+      border-radius: 18px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
     }
 
     .modal-header {
-      padding: 14px 20px;
+      padding: 14px 22px;
       background: #1e293b;
       display: flex;
       justify-content: space-between;
@@ -325,16 +415,19 @@
       background: #ef4444;
       border: none;
       color: #fff;
-      padding: 6px 14px;
+      padding: 6px 16px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
+      transition: background 0.2s ease;
     }
+
+    .modal-close:hover { background: #dc2626; }
 
     #app-viewport {
       flex: 1;
       border: none;
-      background: #fff;
+      background: #ffffff;
     }
 
     /* Modal for QR Code */
@@ -345,8 +438,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(3, 7, 18, 0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
       z-index: 100;
       justify-content: center;
       align-items: center;
@@ -356,21 +449,21 @@
     .qr-card {
       background: #0f172a;
       border: 2px solid #34d399;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 18px;
+      padding: 26px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 16px;
       max-width: 380px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
     }
 
     #qrcode-container {
-      background: #fff;
-      padding: 12px;
-      border-radius: 12px;
+      background: #ffffff;
+      padding: 14px;
+      border-radius: 14px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -379,6 +472,7 @@
 </head>
 <body>
 
+  <!-- Fullscreen Background Video -->
   <div class="video-background">
     <iframe 
       id="bg-player"
@@ -389,22 +483,42 @@
   </div>
   <div class="video-overlay"></div>
 
+  <!-- Top Kind-Usage Student Guidance Banner -->
+  <div class="student-guidance-banner">
+    <span class="banner-pill">🎓 Student Innovation Hub</span>
+    <span>Sagar'AI factory is created for students to learn, invent, and create positive solutions. Please use this platform with kindness, integrity, and respect. Strictly not for harmful or unethical activities.</span>
+  </div>
+
   <header>
-    <div class="brand-title">Sagar'AI factory</div>
-    <div class="brand-motto">⚡ <b>Motto:</b> We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions.</div>
-    <div class="leadership-bar">
-      <span class="leader-badge ceo-badge">By SAGAR MANIKANTA CHOUDHARI</span>
-      <span class="leader-badge cofounder-badge">By J.Y.N.V.Subhash</span>
+    <div class="brand-row">
+      <div>
+        <div class="brand-title">Sagar'AI factory</div>
+        <div class="brand-motto">⚡ <b>Motto:</b> We don't just answer queries; we manufacture custom AI tools, automations, and intelligent solutions.</div>
+      </div>
+      <div class="leadership-bar">
+        <span class="leader-badge ceo-badge">By SAGAR MANIKANTA CHOUDHARI</span>
+        <span class="leader-badge cofounder-badge">By J.Y.N.V.Subhash</span>
+      </div>
     </div>
   </header>
 
   <div id="chat-box">
     <div class="ai-bubble">
-      <div class="ai-tag">✨ Sagar'AI Factory Initialized</div>
+      <div class="ai-tag">✨ Welcome to Your AI Workshop!</div>
       <div>
-        Welcome to <b>Sagar'AI factory</b>.
+        Hello and welcome! 😊 We are delighted to collaborate with you here at <b>Sagar'AI factory</b>.
         <br><br>
-        Ask us to manufacture any tool (e.g., an AI PDF Maker with AI Images, an AI Code Writer, or an AI Resume Screener). We assemble the software instantly and let you <b>use it right here on screen</b> or <b>download it straight into your mobile phone</b>.
+        This factory is your creative student lab. Tell us what AI tool, automation, study companion, or generator you would like to bring to life, and we will manufacture it for you on demand!
+        <br><br>
+        Once manufactured, you can <b>use it right here inside your screen</b> or <b>beam it straight to your mobile device via QR code</b>.
+        <br><br>
+        <i>What wonderful project should we invent together today? Click an idea or speak your thoughts:</i>
+        <div class="quick-chips">
+          <button class="chip-btn" onclick="sendQuickPrompt('Make an AI tool that creates PDFs with real AI images based on my notes')">🎨 AI PDF & Image Creator</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('Build an AI C Code Assistant that generates, explains, and tests C programs')">💻 AI C Code Practice Tool</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('Make an interactive Study Flashcard and Quiz Generator tool')">📚 AI Study Quiz Generator</button>
+          <button class="chip-btn" onclick="sendQuickPrompt('Build an AI Resume and Student Profile Builder tool')">📄 Student Resume Builder</button>
+        </div>
       </div>
     </div>
   </div>
@@ -412,27 +526,27 @@
   <footer>
     <div class="input-row">
       <button class="btn-main" id="speak-btn" type="button" onclick="startVoiceInput()">🎤 Speak</button>
-      <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool to manufacture..." autocomplete="off">
+      <input type="text" id="user-input" placeholder="Tell Sagar'AI what tool you'd like to invent today..." autocomplete="off">
       <button class="btn-main" id="send-btn" type="button" onclick="executeSend()">Send ➔</button>
     </div>
   </footer>
 
-  <!-- Modal for Testing AI Tool Live on Page -->
+  <!-- Modal for Live In-Browser Tool Execution -->
   <div id="tool-modal">
     <div class="modal-frame">
       <div class="modal-header">
-        <span class="modal-title">⚡ Running Manufactured AI Tool</span>
+        <span class="modal-title">⚡ Running Your Manufactured AI Tool</span>
         <button class="modal-close" onclick="closeToolModal()">✕ Close Tool</button>
       </div>
       <iframe id="app-viewport"></iframe>
     </div>
   </div>
 
-  <!-- Modal for QR Code Mobile Transfer -->
+  <!-- Modal for Mobile QR Code Transfer -->
   <div id="qr-modal">
     <div class="qr-card">
-      <h3 style="color: #34d399; font-size: 1.2rem;">📱 Download & Open on Mobile</h3>
-      <p style="color: #cbd5e1; font-size: 0.88rem;">Scan this QR code with your phone camera to launch this AI tool on your mobile device instantly:</p>
+      <h3 style="color: #34d399; font-size: 1.25rem;">📱 Open on Your Phone</h3>
+      <p style="color: #cbd5e1; font-size: 0.88rem;">Scan this QR code with your mobile camera to launch and enjoy your custom tool on your phone right now:</p>
       <div id="qrcode-container"></div>
       <button class="btn-action" style="border-color: #34d399;" onclick="closeQRModal()">Done</button>
     </div>
@@ -453,6 +567,11 @@
         }
       });
     });
+
+    function sendQuickPrompt(promptText) {
+      document.getElementById("user-input").value = promptText;
+      executeSend();
+    }
 
     async function executeSend() {
       const inputField = document.getElementById("user-input");
@@ -476,7 +595,7 @@
       aiBubble.className = "ai-bubble";
       aiBubble.innerHTML = `
         <div class="ai-tag">⚙ Sagar'AI Factory Manufacturing Tool...</div>
-        <div>Assembling your custom AI tool interface and intelligence engine...</div>
+        <div>Crafting your custom AI tool with care! Assembling your interface... ✨</div>
       `;
       chatBox.appendChild(aiBubble);
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -489,15 +608,14 @@
         });
 
         const data = await response.json();
-        const rawContent = data.text || "Your tool has been manufactured and is ready.";
+        const rawContent = data.text || "Your tool has been manufactured and is ready!";
         const appCode = data.html_app;
 
         aiBubble.innerHTML = `
           <div class="ai-tag">✨ Sagar'AI Tool Ready</div>
-          <div style="font-size: 1rem; color: #f1f5f9;">${rawContent.replace(/\n/g, '<br>')}</div>
+          <div style="font-size: 1rem; color: #f8fafc;">${rawContent.replace(/\n/g, '<br>')}</div>
         `;
 
-        // If an executable AI application was manufactured, offer the choice: Use here or Mobile
         if (appCode) {
           const choicePanel = document.createElement("div");
           choicePanel.className = "tool-choice-panel";
@@ -522,7 +640,7 @@
         aiBubble.innerHTML = `
           <div class="ai-tag" style="color: #f87171;">⚠️ Connection Notice</div>
           <div><b>Could not reach Sagar'AI Backend:</b> ${err.message}<br><br>
-          <i>Please wait 15 seconds and try again.</i></div>
+          <i>If the Render backend is waking up, please allow ~15 seconds and try again!</i></div>
         `;
       } finally {
         inputField.disabled = false;
@@ -532,7 +650,6 @@
       }
     }
 
-    /* 1. RUN TOOL DIRECTLY INSIDE BROWSER */
     function runToolHere(htmlContent) {
       const modal = document.getElementById("tool-modal");
       const iframe = document.getElementById("app-viewport");
@@ -545,20 +662,18 @@
       document.getElementById("app-viewport").srcdoc = "";
     }
 
-    /* 2. DOWNLOAD / TRANSFER TO MOBILE VIA QR CODE */
     function transferToMobile(htmlContent) {
       const modal = document.getElementById("qr-modal");
       const container = document.getElementById("qrcode-container");
       container.innerHTML = "";
 
-      // Encode HTML into a data URL for mobile browsers
       const dataUri = "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent);
 
       new QRCode(container, {
         text: dataUri.length < 2000 ? dataUri : window.location.href,
         width: 220,
         height: 220,
-        colorDark: "#030712",
+        colorDark: "#020617",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
@@ -570,7 +685,6 @@
       document.getElementById("qr-modal").style.display = "none";
     }
 
-    /* 3. DOWNLOAD TOOL FILE */
     function downloadToolFile(htmlContent, promptTopic) {
       const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -583,7 +697,6 @@
       URL.revokeObjectURL(url);
     }
 
-    /* SPEECH RECOGNITION */
     let recognition = null;
     function startVoiceInput() {
       const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -616,7 +729,6 @@
       try { recognition.start(); } catch (err) { speakBtn.innerText = "🎤 Speak"; }
     }
 
-    /* YOUTUBE BACKGROUND LOOP */
     let player;
     function onYouTubeIframeAPIReady() {
       try {
